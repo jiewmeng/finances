@@ -1,0 +1,11 @@
+{
+  "name": "finances2019",
+  "version": "1.0.0",
+  "description": "## Goals",
+  "main": "index.js",
+  "scripts": {
+    "build:web": "(cd web; webpack --config webpack.config.js)"
+  },
+  "author": "Jiew Meng <jiewmeng@gmail.com>",
+  "license": "MIT"
+}

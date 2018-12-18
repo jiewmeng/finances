@@ -62,7 +62,7 @@ Since NoSQL Firestore is not suited for aggregation workloads, the alternative i
             - {id}
                 - STRING
 
-# CloudStorage
+## CloudStorage
 
 - user
     - {userId}
@@ -76,8 +76,17 @@ Since NoSQL Firestore is not suited for aggregation workloads, the alternative i
         - UOBCard
         - SCCard
 
+
+
 # TODOs
 
+[X] #SetupUI Should compile React files
+[X] #SetupUI Should compile CSS Next files
+[X] #SetupUI Should have hot reload
+[ ] #SetupUI Should lint code
+[ ] #SetupUI Should be able to deploy to Firebase Hosting
+[ ] #SetupServer Should be able to deploy to Cloud Functions
+[ ] #SetupServer Should be able to deploy to AppEngine
 [ ] #UI Should be able to login with Google account
 [ ] #DatastoreRules Should validate login is within whitelisted accounts only (https://goo.gl/mBxDBp)
 [ ] #UI Should be able to upload statement to cloud storage
