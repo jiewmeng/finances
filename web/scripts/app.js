@@ -8,6 +8,7 @@ const App = () => {
   return (
     <div>
       <h1>Finances</h1>
+      <a href="/test.txt" target="_blank">Test</a>
     </div>
   )
 }

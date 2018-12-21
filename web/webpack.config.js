@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const config = require('./config/_init')()
 
 const ENV = process.env.NODE_ENV || ''
@@ -55,10 +56,16 @@ module.exports = {
       filename: devMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: devMode ? '[id].css' : '[id].[hash].css'
     }),
+    new CopyWebpackPlugin([
+      {
+        from: 'assets',
+        to: '.'
+      }
+    ]),
     new webpack.DefinePlugin(config),
   ],
   devServer: {
-    contentBase: '.',
+    contentBase: './assets',
     historyApiFallback: true
   }
 }
