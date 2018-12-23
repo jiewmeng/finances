@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.html",
   "scripts": {
+    "lint": "eslint scripts/**/*.js",
     "build": "webpack --config webpack.config.js",
     "dev": "webpack-dev-server --hot --color --history-api-fallback --config webpack.config.js"
   },
@@ -13,9 +14,12 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.0.1",
+    "eslint": "^5.10.0",
+    "eslint-plugin-react": "^7.11.1",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.5.0",
     "postcss-loader": "^3.0.0",
@@ -30,6 +34,8 @@
     "@babel/polyfill": "^7.0.0",
     "lodash": "^4.17.11",
     "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "react-dom": "^16.6.3",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1"
   }
 }

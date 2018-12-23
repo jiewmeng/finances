@@ -84,7 +84,7 @@ Since NoSQL Firestore is not suited for aggregation workloads, the alternative i
 [X] #SetupUI Should compile CSS Next files
 [X] #SetupUI Should have hot reload
 [X] #SetupUI Should copy assets
-[ ] #SetupUI Should lint code
+[X] #SetupUI Should lint code
 [X] #SetupUI Should be able to deploy to Firebase Hosting
 [ ] #SetupServer Should be able to deploy to Cloud Functions
 [ ] #SetupServer Should be able to deploy to AppEngine
