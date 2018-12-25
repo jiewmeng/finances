@@ -8,9 +8,7 @@ import 'app/css/app.css'
 import 'app/css/topbar.css'
 
 import Topbar from 'app/scripts/app/Topbar'
-import Test1 from 'app/scripts/test/Test1'
-import Test2 from 'app/scripts/test/Test2'
-import Default from 'app/scripts/test/Default'
+import Dashboard from 'app/scripts/Dashboard'
 
 const App = () => {
   return (
@@ -20,9 +18,7 @@ const App = () => {
           <Topbar />
 
           <Switch>
-            <Route path="/test1" component={Test1} />
-            <Route path="/test2" component={Test2} />
-            <Route component={Default} />
+            <Route component={Dashboard} />
           </Switch>
         </React.Fragment>
       </Router>

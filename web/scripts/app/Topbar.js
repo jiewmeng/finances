@@ -1,15 +1,25 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import IconButton from '@material-ui/core/IconButton'
+import Icon from '@material-ui/core/Icon'
+import Typography from '@material-ui/core/Typography'
 
 export default function Topbar() {
   return (
-    <div className="topbar">
-      <h1 className="topbar-appname">Finances</h1>
-
-      <nav class="topbar-nav">
-        <Link to="/statements/upload"><i className="material-icons">cloud_upload</i></Link>
-        <Link to="/transactions"><i className="material-icons">view_list</i></Link>
-      </nav>
-    </div>
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" color="inherit" className="topbar-title">
+          Finances
+        </Typography>
+        <IconButton color="inherit">
+          <Icon>cloud_upload</Icon>
+        </IconButton>
+        <IconButton color="inherit">
+          <Icon>view_list</Icon>
+        </IconButton>
+      </Toolbar>
+    </AppBar>
   )
 }

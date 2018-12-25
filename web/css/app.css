@@ -14,3 +14,11 @@ body {
 h1 {
   font-weight: 400;
 }
+
+.content-wrapper {
+  padding: 25px;
+}
+
+.paper-wrapper {
+  padding: 30px;
+}
