@@ -86,6 +86,9 @@ Since NoSQL Firestore is not suited for aggregation workloads, the alternative i
 [X] #SetupUI Should copy assets
 [X] #SetupUI Should lint code
 [X] #SetupUI Should be able to deploy to Firebase Hosting
+[X] #SetupUI Should have routing support
+[X] #SetupUI Should support Google Web Fonts
+[ ] #SetupUI Should have basic layouts
 [ ] #SetupServer Should be able to deploy to Cloud Functions
 [ ] #SetupServer Should be able to deploy to AppEngine
 [ ] #UI Should be able to login with Google account

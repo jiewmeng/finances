@@ -3,6 +3,7 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const postcssPresetEnv = require('postcss-preset-env')
 const config = require('./config/_init')()
 
 const ENV = process.env.NODE_ENV || ''
@@ -37,11 +38,35 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: 'fonts/'
+          }
+        }]
+      },
+      {
         test: /\.css$/,
         loaders: [
           devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
           'css-loader',
-          'postcss-loader'
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: () => {
+                return [
+                  postcssPresetEnv({
+                    stage: 1,
+                    features: {
+                      'nesting-rules': true
+                    }
+                  })
+                ]
+              }
+            }
+          }
         ]
       },
     ]

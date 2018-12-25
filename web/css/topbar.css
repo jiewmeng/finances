@@ -1,0 +1,36 @@
+.topbar {
+  background-color: #fff;
+  color: #333;
+  padding: 0 30px;
+  box-shadow: 0 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.topbar h1 {
+  font-weight: 300;
+  font-size: 26px;
+  line-height: 66px;
+  margin: 0;
+}
+
+.topbar-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+
+  & a {
+    flex: 1;
+    display: block;
+    font-size: 18px;
+    font-weight: 300;
+    color: #555;
+    text-decoration: none;
+    line-height: 66px;
+    padding: 0 12px;
+  }
+
+  & .material-icons {
+    font-size: 30px;
+    line-height: 66px;
+  }
+}

@@ -3,8 +3,11 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
 
 import 'app/css/normalize.css'
+import 'app/assets/fonts/material-icons/material-icons.css'
 import 'app/css/app.css'
+import 'app/css/topbar.css'
 
+import Topbar from 'app/scripts/app/Topbar'
 import Test1 from 'app/scripts/test/Test1'
 import Test2 from 'app/scripts/test/Test2'
 import Default from 'app/scripts/test/Default'
@@ -12,17 +15,9 @@ import Default from 'app/scripts/test/Default'
 const App = () => {
   return (
     <div>
-      <h1>Finances</h1>
       <Router>
         <React.Fragment>
-          <ul>
-            <li>
-              <Link to="/test1">Test 1</Link>
-            </li>
-            <li>
-              <Link to="/test2">Test 2</Link>
-            </li>
-          </ul>
+          <Topbar />
 
           <Switch>
             <Route path="/test1" component={Test1} />

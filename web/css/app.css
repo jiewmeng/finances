@@ -1,5 +1,5 @@
 :root {
-  --background-color: #e0e0ee;
+  --background-color: #f0f0f0;
   --content-color: #111;
   --body-font-family: 'Open Sans', sans-serif;
 }
@@ -8,7 +8,7 @@ body {
   background:var(--background-color);
   color: var(--content-color);
   font-family: var(--body-font-family);
-  padding: 20px;
+  padding: 0;
 }
 
 h1 {
