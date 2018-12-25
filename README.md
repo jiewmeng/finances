@@ -80,36 +80,36 @@ Since NoSQL Firestore is not suited for aggregation workloads, the alternative i
 
 # TODOs
 
-[X] #SetupUI Should compile React files
-[X] #SetupUI Should compile CSS Next files
-[X] #SetupUI Should have hot reload
-[X] #SetupUI Should copy assets
-[X] #SetupUI Should lint code
-[X] #SetupUI Should be able to deploy to Firebase Hosting
-[X] #SetupUI Should have routing support
-[X] #SetupUI Should support Google Web Fonts
-[ ] #SetupUI Should have basic layouts
-[ ] #SetupServer Should be able to deploy to Cloud Functions
-[ ] #SetupServer Should be able to deploy to AppEngine
-[ ] #UI Should be able to login with Google account
-[ ] #DatastoreRules Should validate login is within whitelisted accounts only (https://goo.gl/mBxDBp)
-[ ] #UI Should be able to upload statement to cloud storage
-[ ] #DatastoreRules Should validate authenticated user can only upload to specified folder
-[ ] #DatastoreTrigger Should trigger when DBS bank statement is uploaded. To parse and get balances.
-[ ] #UI Should be able to list assets 
-[ ] #DatastoreTrigger Should trigger when UOB bank statement is uploaded. To parse and get balances. 
-[ ] #DatastoreTrigger Should trigger when POEMS statement is uploaded. To parse and get balances. 
-[ ] #DatastoreTrigger Should trigger when StashAway statement is uploaded. To parse and get balances. 
-[ ] #DatastoreTrigger Should trigger when CDP statement is uploaded. To parse and get balances. 
-[ ] #DatastoreTrigger Should trigger when CPF statement is uploaded. To parse and get balances. 
-[ ] #UI Should be able to chart assets by month
-[ ] #DatastoreTrigger Extend to extract transactions for DBS Bank
-[ ] #DatastoreTrigger Extend to extract transactions for UOB Bank
-[ ] #DatastoreTrigger Extend to extract transactions for StashAway
-[ ] #DatastoreTrigger Extend to extract transactions for CDP
-[ ] #DatastoreTrigger Extend to extract transactions for CPF
-[ ] #DatastoreTrigger Extend to parse transactions from DBS credit card statement
-[ ] #DatastoreTrigger Extend to parse transactions from UOB credit card statement
-[ ] #DatastoreTrigger Extend to parse transactions from SC credit card statement
-[ ] #UI Should be able to list transactions
-[ ] #UI Should be able to chart expenses by month
+- [X] #SetupUI Should compile React files
+- [X] #SetupUI Should compile CSS Next files
+- [X] #SetupUI Should have hot reload
+- [X] #SetupUI Should copy assets
+- [X] #SetupUI Should lint code
+- [X] #SetupUI Should be able to deploy to Firebase Hosting
+- [X] #SetupUI Should have routing support
+- [X] #SetupUI Should support Google Web Fonts
+- [ ] #SetupUI Should have basic layouts
+- [ ] #SetupServer Should be able to deploy to Cloud Functions
+- [ ] #SetupServer Should be able to deploy to AppEngine
+- [ ] #UI Should be able to login with Google account
+- [ ] #DatastoreRules Should validate login is within whitelisted accounts only (https://goo.gl/mBxDBp)
+- [ ] #UI Should be able to upload statement to cloud storage
+- [ ] #DatastoreRules Should validate authenticated user can only upload to specified folder
+- [ ] #DatastoreTrigger Should trigger when DBS bank statement is uploaded. To parse and get balances.
+- [ ] #UI Should be able to list assets 
+- [ ] #DatastoreTrigger Should trigger when UOB bank statement is uploaded. To parse and get balances. 
+- [ ] #DatastoreTrigger Should trigger when POEMS statement is uploaded. To parse and get balances. 
+- [ ] #DatastoreTrigger Should trigger when StashAway statement is uploaded. To parse and get balances. 
+- [ ] #DatastoreTrigger Should trigger when CDP statement is uploaded. To parse and get balances. 
+- [ ] #DatastoreTrigger Should trigger when CPF statement is uploaded. To parse and get balances. 
+- [ ] #UI Should be able to chart assets by month
+- [ ] #DatastoreTrigger Extend to extract transactions for DBS Bank
+- [ ] #DatastoreTrigger Extend to extract transactions for UOB Bank
+- [ ] #DatastoreTrigger Extend to extract transactions for StashAway
+- [ ] #DatastoreTrigger Extend to extract transactions for CDP
+- [ ] #DatastoreTrigger Extend to extract transactions for CPF
+- [ ] #DatastoreTrigger Extend to parse transactions from DBS credit card statement
+- [ ] #DatastoreTrigger Extend to parse transactions from UOB credit card statement
+- [ ] #DatastoreTrigger Extend to parse transactions from SC credit card statement
+- [ ] #UI Should be able to list transactions
+- [ ] #UI Should be able to chart expenses by month
