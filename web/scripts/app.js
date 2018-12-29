@@ -9,21 +9,44 @@ import 'app/css/topbar.css'
 
 import Topbar from 'app/scripts/app/Topbar'
 import Dashboard from 'app/scripts/Dashboard'
+import Login from 'app/scripts/auth/Login'
 
-const App = () => {
-  return (
-    <div>
-      <Router>
-        <React.Fragment>
-          <Topbar />
+import AppContext from 'app/scripts/AppContext'
 
-          <Switch>
-            <Route component={Dashboard} />
-          </Switch>
-        </React.Fragment>
-      </Router>
-    </div>
-  )
+class App extends React.Component {
+  constructor(params) {
+    super(params)
+
+    this.state = {
+      token: undefined,
+      expiry: undefined,
+      setToken: this.setToken.bind(this)
+    }
+  }
+
+  setToken(token, expiry) {
+    this.setState({
+      token,
+      expiry
+    })
+  }
+
+  render() {
+    return (
+      <AppContext.Provider value={this.state}>
+        <Router>
+          <React.Fragment>
+            <Topbar />
+
+            <Switch>
+              <Route paht="/auth/login" component={Login} />
+              <Route component={Dashboard} />
+            </Switch>
+          </React.Fragment>
+        </Router>
+      </AppContext.Provider>
+    )
+  }
 }
 
 ReactDOM.render(
