@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const postcssPresetEnv = require('postcss-preset-env')
-const config = require('./config/_init')()
+// const config = require('./config/_init')()
 
 const ENV = process.env.NODE_ENV || ''
 const devMode = !ENV.match(/^staging|production$/)
@@ -87,7 +87,7 @@ module.exports = {
         to: '.'
       }
     ]),
-    new webpack.DefinePlugin(config),
+    // new webpack.DefinePlugin(config),
   ],
   devServer: {
     contentBase: './assets',
