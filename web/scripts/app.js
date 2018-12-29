@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Link, Switch } from 'react-router-dom'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 
@@ -15,6 +15,7 @@ import Login from 'app/scripts/auth/Login'
 import initConfig from 'app/scripts/config'
 
 import AppContext from 'app/scripts/AppContext'
+import AuthenticatedRoute from './app/AuthenticatedRoute';
 
 const config = initConfig()
 console.log(config)
@@ -51,6 +52,7 @@ class App extends React.Component {
   }
 
   render() {
+    console.log(this.state.uid)
     return (
       <AppContext.Provider value={this.state}>
         <Router>
@@ -58,8 +60,8 @@ class App extends React.Component {
             <Topbar />
 
             <Switch>
-              <Route paht="/auth/login" component={Login} />
-              <Route component={Dashboard} />
+              <Route path="/auth/login" render={() => Boolean(this.state.uid) ? <Redirect to="/" /> : <Login />} />
+              <AuthenticatedRoute component={Dashboard} />
             </Switch>
           </React.Fragment>
         </Router>
