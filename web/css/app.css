@@ -37,3 +37,11 @@ h1 {
   min-width: 300px;
   max-width: 360px;
 }
+
+.button-icon {
+  margin-right: 10px;
+}
+
+.hide {
+  opacity: 0;
+}

@@ -9,7 +9,7 @@ export default class AuthenticatedRoute extends React.Component {
         {({ uid }) => {
           const isLoggedIn = Boolean(uid)
           if (!isLoggedIn) {
-            return <Redirect to="/auth/login" />
+            return <Redirect to={{ pathname: '/auth/login', state: { redirectUrl: this.props.location.pathname } }} />
           }
 
           return <Route {...this.props} />
