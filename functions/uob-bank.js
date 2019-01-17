@@ -13,9 +13,9 @@ module.exports = function (buf) {
   const regexAccount = /^(.*)\s+(\d{3}-\d{3}-\d{3}-\d{1})/
   const regexEnd = /End of Transaction Details/
   const regexDate = /^\d{2} \w{3}$/
-  const regexValue = /^\d+(,\d+)?\.\d{2}$/
   const regexStatementDate = /^Account Overview as at (\d{2} \w{3} \d{4})$/
   const accounts = {}
+  let statementDate
   let statementYearMonth
   let statementYear
 
@@ -53,7 +53,7 @@ module.exports = function (buf) {
           // Parse statement date in page 1
           if (data.pageIndex === 0 && regexStatementDate.test(line.str)) {
             const [, dateStr] = regexStatementDate.exec(line.str)
-            const statementDate = DateTime.fromFormat(dateStr, 'dd MMM yyyy')
+            statementDate = DateTime.fromFormat(dateStr, 'dd MMM yyyy')
             statementYear = statementDate.toFormat('yyyy')
             statementYearMonth = statementDate.toFormat('yyyyMM')
             return
@@ -71,7 +71,7 @@ module.exports = function (buf) {
 
           // Match account name
           if (!isEnd && isParsing && regexAccount.test(line.str)) {
-            const [, accountName, accountNum] = regexAccount.exec(line.str)
+            const [, accountName, accountNumber] = regexAccount.exec(line.str)
             account = `${accountName} ${accountNumber}`.replace(/\s+/ig, ' ')
             if (!(account in accounts)) {
               accounts[account] = {
@@ -224,13 +224,18 @@ module.exports = function (buf) {
           txn.statement = `uob-bank-${statementYearMonth}`
           txn.accountName = accounts[account].accountName
           txn.accountNumber = accounts[account].accountNumber
+          txn.amount = txn.deposits - txn.withdrawals
+          delete txn.withdrawals
+          delete txn.deposits
           txn.id = `${txn.date}-${i}`
         })
       })
 
-      console.log(JSON.stringify(accounts, null, 2))
+      const date = DateTime.fromFormat(`${statementYearMonth}01`, 'yyyyMMdd')
       return {
         statementId: `uob-bank-${statementYearMonth}`,
+        startDate: statementDate.startOf('month').toFormat('yyyy-MM-dd'),
+        endDate: statementDate.endOf('month').toFormat('yyyy-MM-dd'),
         accounts
       }
     })

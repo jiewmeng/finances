@@ -11,94 +11,32 @@ admin.initializeApp(functions.config().firebase)
 
 const pdf = require('pdf-parse')
 
-exports.onStatementUploadParse = functions.storage.object().onFinalize((obj, context) => {
-  const storage = new Storage({
-    projectId: process.env.GCP_PROJECT
-  })
-  const bucketName = obj.bucket
-  const contentType = obj.contentType
-  const filePath = obj.name
-  const parts = filePath.split('/')
+exports.onStatementUploadParse = require('./storageOnStatementUploadParse')
 
-  if (contentType !== 'application/pdf') {
-    console.warn('File is not a PDF ... skipping')
-    return
-  }
+// // Recompute aggregations
+// function onStatementChange(userId, statementId) {
+//   const db = admin.firestore()
 
-  if (parts.length !== 2) {
-    console.warn('Path length is not 2 ... skipping')
-    return
-  }
-  const regexFile = /^(dbs|dbscredit|uob|uobcredit|sc|stashaway|poems)-\d{4}-\d{2}\.pdf$/
-  if (!regexFile.test(parts[1])) {
-    console.warn(`Part 2 does not match statement filename: Got ${parts[1]} ... skipping`)
-    return
-  }
+//   // Get transactions for the statement ...
+//   return db.runTransaction(t => {
+//     const transactionsQuery = db.collection(`users/${userId}/transactions`)
+//       .where('statement', '==', statementId)
+//     return t.get(transactionsQuery)
+//       .then(transactions => {
+//         const aggregations = []
 
-  // download pdf
-  const bucket = storage.bucket(obj.bucket)
-  const tempFilePath = path.join(os.tmpdir(), path.basename(filePath))
-  return bucket.file(filePath)
-    .download({ destination: tempFilePath })
-    .then(() => {
-      const buf = fs.readFileSync(tempFilePath)
+//         console.log()
+//       })
+//   })
 
-      const [, type] = regexFile.exec(parts[1])
-      switch (type) {
-        case 'uob':
-          return require('./uob-bank')(buf)
-        default:
-          throw new Error(`unknown type ${type}, ${parts[1]}`)
-      }
-    })
-    .then(data => {
-      const db = admin.firestore()
-      const statementId = data.statementId
-      const statementsRef = db.collection(`users/${parts[0]}/statements`)
-      const transactionsRef = db.collection(`users/${parts[0]}/transactions`)
+//   // Compute aggregations, grouped by day
 
-      const existingStatementQuery = statementsRef.doc(data.statementId)
-      const existingTransactionsQuery = transactionsRef
-        .where('statement', '==', data.statementId)
+//   // Delete old aggregations
 
-      const transaction = db.runTransaction(t => {
-        // Delete existing statement and transactions objects
-        console.log('Deleting old data ...')
-        return t.get(existingTransactionsQuery)
-          .then(txns => {
-            t.delete(existingStatementQuery)
-            txns.forEach(txn => t.delete(txn.ref))
-          })
-          .then(() => {
-            // Add back new statement and transactions
-            const statementRef = statementsRef.doc(statementId)
-            const accounts = {}
-            Object.keys(data.accounts).forEach(a => {
-              accounts[data.accounts[a].accountNumber] = {
-                name: a,
-                accountNumber: data.accounts[a].accountNumber,
-                startingBalance: data.accounts[a].startingBalance,
-                endingBalance: data.accounts[a].endingBalance,
-                interest: data.accounts[a].interest
-              }
-            })
-            const statementRecord = {
-              isParsed: false,
-              uploadedOn: DateTime.local().toISO(),
-              accounts
-            }
-            t.set(statementRef, statementRecord)
+//   // Add new aggregations
+// }
 
-            console.log('Adding new transactions ...')
-            Object.keys(data.accounts).forEach(a => {
-              data.accounts[a].transactions.forEach(txnData => {
-                const txnRef = transactionsRef.doc(`${txnData.statement}::${txn.accountNumber}::${txnData.id}`)
-                t.create(txnRef, txnData)
-              })
-            })
-
-            console.log('Done!')
-          })
-      })
-    })
-})
+// exports.onStatementSaved = functions.firestore.document('users/{userId}/statements/{statementId}').onCreate((snapshot, context) => {
+//   const { userId, statementId } = context.params
+//   return onStatementChange(userId, statementId)
+// })
