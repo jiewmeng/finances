@@ -13,6 +13,7 @@ import Topbar from 'app/scripts/app/Topbar'
 import Dashboard from 'app/scripts/Dashboard'
 import Login from 'app/scripts/auth/Login'
 import Upload from 'app/scripts/statements/Upload'
+import Transactions from 'app/scripts/transactions/Transactions'
 import initConfig from 'app/scripts/config'
 
 import AppContext from 'app/scripts/AppContext'
@@ -59,6 +60,7 @@ class App extends React.Component {
             <Switch>
               <Route path="/auth/login" component={Login} />
               <AuthenticatedRoute path="/statements/upload" component={Upload} />
+              <AuthenticatedRoute path="/transactions" component={Transactions} />
               <AuthenticatedRoute component={Dashboard} />
             </Switch>
           </React.Fragment>

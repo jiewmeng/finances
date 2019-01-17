@@ -58,9 +58,13 @@ export default class Topbar extends React.Component {
                         </IconButton>
                       </Link>
                     </Tooltip>
-                    <IconButton color="inherit">
-                      <Icon>view_list</Icon>
-                    </IconButton>
+                    <Tooltip title="Transactions">
+                      <Link to="/transactions" className="link-icon">
+                        <IconButton color="inherit">
+                          <Icon>view_list</Icon>
+                        </IconButton>
+                      </Link>
+                    </Tooltip>
                     <Tooltip title={`Logged in as ${displayName}`}>
                       <IconButton onClick={this.openUserMenu}>
                         <Avatar alt={displayName} src={photoURL} />
