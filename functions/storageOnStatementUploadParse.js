@@ -41,7 +41,8 @@ module.exports = functions.storage.object().onFinalize((obj, context) => {
   // download pdf
   const bucket = storage.bucket(obj.bucket)
   const tempFilePath = path.join(os.tmpdir(), path.basename(filePath))
-  return bucket.file(filePath)
+  const file = bucket.file(filePath)
+  return file
     .download({ destination: tempFilePath })
     .then(() => {
       const buf = fs.readFileSync(tempFilePath)
@@ -104,6 +105,10 @@ module.exports = functions.storage.object().onFinalize((obj, context) => {
               })
             })
 
+            // Delete file once done
+            return file.delete()
+          })
+          .then(() => {
             console.log('Done!')
           })
       })

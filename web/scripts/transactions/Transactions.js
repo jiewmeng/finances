@@ -77,9 +77,8 @@ class Transactions extends React.Component {
             </TableHead>
             <TableBody>
               {transactions.map(transaction => {
-                console.log(transaction.description, transaction.deposits, transaction.withdrawals)
                 return (
-                  <TableRow>
+                  <TableRow key={transaction.id}>
                     <TableCell>{transaction.date}</TableCell>
                     <TableCell>
                       {
@@ -89,9 +88,21 @@ class Transactions extends React.Component {
                           })
                       }
                     </TableCell>
-                    <TableCell>{transaction.deposits - transaction.withdrawals}</TableCell>
-                    <TableCell>{transaction.balance}</TableCell>
-                    <TableCell>{transaction.category}</TableCell>
+                    <TableCell>
+                      <Typography className={classNames([classes.textNumber, transaction.amount < 0 ? classes.amountNegative : classes.amountPositive])}>
+                        {transaction.amount.toFixed(2)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography className={classNames([classes.textNumber])}>
+                        {transaction.balance.toFixed(2)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography className={classNames([transaction.category === 'Unknown' ? classes.textMuted : ''])}>
+                        {transaction.category}
+                      </Typography>
+                    </TableCell>
                     <TableCell>{transaction.accountName} {transaction.accountNumber}</TableCell>
                   </TableRow>
                 )
@@ -120,6 +131,19 @@ const styles = {
     marginBottom: 20,
     borderBottom: '1px solid #e0e0e0',
     lineHeight: '46px'
+  },
+  textNumber: {
+    textAlign: 'right'
+  },
+  amountPositive: {
+    color: 'green'
+  },
+  amountNegative: {
+    color: 'red'
+  },
+  textMuted: {
+    color: 'grey',
+    fontStyle: 'italic'
   }
 }
 

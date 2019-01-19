@@ -217,6 +217,8 @@ module.exports = function (buf) {
             txn.category = 'Taxes'
           } else if (/UOB CARD CENTRE|UOB Cards/ig.test(txn.description)) {
             txn.category = 'Credit Card Payment'
+          } else if (/TRANSITLIN/ig.test(txn.description)) {
+            txn.category = 'Transport'
           } else {
             txn.category = 'Unknown'
           }
@@ -225,6 +227,7 @@ module.exports = function (buf) {
           txn.accountName = accounts[account].accountName
           txn.accountNumber = accounts[account].accountNumber
           txn.amount = txn.deposits - txn.withdrawals
+          txn.type = 'CASH'
           delete txn.withdrawals
           delete txn.deposits
           txn.id = `${txn.date}-${i}`
