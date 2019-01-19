@@ -219,6 +219,10 @@ module.exports = function (buf) {
             txn.category = 'Credit Card Payment'
           } else if (/TRANSITLIN/ig.test(txn.description)) {
             txn.category = 'Transport'
+          } else if (/PAYNOW/ig.test(txn.description)) {
+            txn.category = 'PayNow'
+          } else if (/Cash Withdrawal/ig.test(txn.description)) {
+            txn.category = 'Withdrawal'
           } else {
             txn.category = 'Unknown'
           }
