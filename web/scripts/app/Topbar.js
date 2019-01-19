@@ -51,6 +51,13 @@ export default class Topbar extends React.Component {
               if (uid) {
                 return (
                   <React.Fragment>
+                    <Tooltip title="Dashboard">
+                      <Link to="/" className="link-icon">
+                        <IconButton color="inherit">
+                          <Icon>show_chart</Icon>
+                        </IconButton>
+                      </Link>
+                    </Tooltip>
                     <Tooltip title="Upload Statement">
                       <Link to="/statements/upload" className="link-icon">
                         <IconButton color="inherit">
