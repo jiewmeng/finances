@@ -14,7 +14,39 @@ module.exports = class Parser {
     const readFile = util.promisify(fs.readFile).bind(fs)
     const buf = await readFile(filepath)
 
-    const result = await UobParser(buf)
-    console.log(JSON.stringify(result, undefined, 2))
+    const filename = path.basename(filepath)
+    const regexFilename = /^(dbscredit|dbs|uobcredit|uob|poems)-(\d{4})-(\d{2}).pdf$/
+    const matchFilename = regexFilename.exec(filename)
+    if (!matchFilename) {
+      return console.error('Invalid filename format', filename)
+    }
+    let [, type, year, month] = matchFilename
+    year = parseInt(year, 10)
+    month = parseInt(month, 10)
+
+    console.log(type, year, month)
+
+    let output
+    switch (type) {
+      // case 'dbs':
+      //   output = require('./dbs')(data, year, month, monthNumber)
+      //   break
+      // case 'dbscredit':
+      //   output = require('./dbscredit')(data, year, month, monthNumber)
+      //   break
+      case 'uob':
+        output = await UobParser(buf)
+        break
+      // case 'uobcredit':
+      //   output = require('./uobcredit')(data, year, month, monthNumber)
+      //   break
+      // case 'poems':
+      //   output = require('./poems')(data, year, month, monthNumber)
+      //   break
+      default:
+        console.log(`Invalid type ${type}`)
+    }
+
+    console.log(JSON.stringify(output, undefined, 2))
   }
 }
