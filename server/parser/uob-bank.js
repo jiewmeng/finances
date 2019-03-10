@@ -194,13 +194,13 @@ module.exports = function (buf) {
           return sum
         }, 0)
 
-        accounts[account].totalWithdrawals = accounts[account].transactions.reduce((sum, txn) => {
+        accounts[account].totalWithdrawals = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
           return sum + txn.withdrawals
-        }, 0)
+        }, 0).toFixed(2))
 
-        accounts[account].totalDeposits = accounts[account].transactions.reduce((sum, txn) => {
+        accounts[account].totalDeposits = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
           return sum + txn.deposits
-        }, 0)
+        }, 0).toFixed(2))
 
         accounts[account].transactions.forEach((txn, i) => {
           if (txn.description === 'One Bonus Interest' || txn.description === 'Interest Credit') {

@@ -1,6 +1,6 @@
 root = true
 
-[{web/**,config/**,web/webpack.config.js,functions/**}]
+[{web/**,server/**}]
 charset = utf-8
 indent_style = space
 indent_size = 2

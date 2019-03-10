@@ -1,0 +1,15 @@
+{
+  "name": "finances-server",
+  "version": "1.0.0",
+  "description": "## Tech Stack",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "luxon": "^1.11.4",
+    "pdf-parse": "^1.1.1"
+  }
+}
