@@ -186,14 +186,18 @@ module.exports = function (buf) {
 
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
     .then(() => {
+      const idPrefix = `cash-uob${statementDate.toFormat('yyyyMM')}`
+
       // Compute interests and other fields
       Object.keys(accounts).forEach(account => {
-        accounts[account].interest = accounts[account].transactions.reduce((sum, txn) => {
+        const accIdForPrefix = `${account.toLowerCase().replace(/[\s-]/g, '')}`
+
+        accounts[account].interest = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
           if (txn.description === 'One Bonus Interest' || txn.description === 'Interest Credit') {
             return sum + txn.deposits
           }
           return sum
-        }, 0)
+        }, 0).toFixed(2))
 
         accounts[account].totalWithdrawals = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
           return sum + txn.withdrawals
@@ -228,14 +232,10 @@ module.exports = function (buf) {
             txn.category = 'Unknown'
           }
 
-          txn.statement = `uob-bank-${statementYearMonth}`
-          txn.accountName = accounts[account].accountName
-          txn.accountNumber = accounts[account].accountNumber
           txn.amount = txn.deposits - txn.withdrawals
-          txn.type = 'CASH'
           delete txn.withdrawals
           delete txn.deposits
-          txn.id = `${txn.date}-${i}`
+          txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
         })
       })
 
