@@ -71,7 +71,8 @@ module.exports = function (buf) {
 
           // Match account name
           if (!isEnd && isParsing && regexAccount.test(line.str)) {
-            const [, accountName, accountNumber] = regexAccount.exec(line.str)
+            let [, accountName, accountNumber] = regexAccount.exec(line.str)
+            accountName = accountName.trim()
             account = `${accountName} ${accountNumber}`.replace(/\s+/ig, ' ')
             if (!(account in accounts)) {
               accounts[account] = {

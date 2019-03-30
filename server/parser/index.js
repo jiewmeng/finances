@@ -3,6 +3,7 @@ const fs = require('fs')
 const util = require('util')
 
 const UobParser = require('./uob-bank')
+const DbsParser = require('./dbs-bank')
 
 module.exports = class Parser {
   /**
@@ -24,13 +25,11 @@ module.exports = class Parser {
     year = parseInt(year, 10)
     month = parseInt(month, 10)
 
-    console.log(type, year, month)
-
     let output
     switch (type) {
-      // case 'dbs':
-      //   output = require('./dbs')(data, year, month, monthNumber)
-      //   break
+      case 'dbs':
+        output = await DbsParser(buf)
+        break
       // case 'dbscredit':
       //   output = require('./dbscredit')(data, year, month, monthNumber)
       //   break
@@ -47,6 +46,6 @@ module.exports = class Parser {
         console.log(`Invalid type ${type}`)
     }
 
-    console.log(JSON.stringify(output, undefined, 2))
+    return output
   }
 }

@@ -4,11 +4,15 @@
   "description": "## Tech Stack",
   "main": "test.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:layer": "rm -rf build; mkdir build build/nodejs; cp package*.json build/nodejs; (cd build/nodejs; npm i) && (cd build; zip -r ./nodemodules.zip .)",
+    "build:source": "rm -rf build; mkdir build; cp -R parser index.js build && (cd build; zip -r ./source.zip .)",
+    "deploy": ""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.422.0",
     "luxon": "^1.11.4",
     "pdf-parse": "^1.1.1"
   }
