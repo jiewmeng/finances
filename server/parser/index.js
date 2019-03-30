@@ -43,7 +43,7 @@ module.exports = class Parser {
       //   output = require('./poems')(data, year, month, monthNumber)
       //   break
       default:
-        console.log(`Invalid type ${type}`)
+        console.log(`[INVALID_STMT] Invalid type ${type}`)
     }
 
     return output
