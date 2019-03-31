@@ -5,9 +5,12 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:layer": "rm -rf build; mkdir build build/nodejs; cp package*.json build/nodejs; (cd build/nodejs; npm i) && (cd build; zip -r ./nodemodules.zip .)",
-    "build": "rm -rf build; mkdir build; cp -R parser index.js build && (cd build; zip -r ./source.zip .)",
-    "deploy": ""
+    "build:layer": "rm -rf build/layer; mkdir build/layer build/layer/nodejs; cp package*.json build/layer/nodejs; (cd build/layer/nodejs; npm i) && (cd build/layer; zip -r ./nodemodules.zip .)",
+    "build": "rm -rf build/source; mkdir build/source; cp -R parser index.js build/source && (cd build/source; zip -r ./source.zip .)",
+    "deploy": "",
+    "tf:init": "(cd terraform; terraform init -backend-config=env/dev.backend.config)",
+    "tf:plan": "(cd terraform; terraform plan -var-file=env/dev.tfvars -out plan.out)",
+    "tf:apply": "(cd terraform; terraform apply plan.out)"
   },
   "author": "",
   "license": "ISC",

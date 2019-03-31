@@ -15,7 +15,7 @@ const dynamodb = new AWS.DynamoDB()
 const dynamodbBatchWrite = util.promisify(dynamodb.batchWriteItem).bind(dynamodb)
 const dynamodbQuery = util.promisify(dynamodb.query).bind(dynamodb)
 
-const regexS3Key = /^[\w\d-]+\/(dbscredit|dbs|uobcredit|uob|poems)-(\d{4})-(\d{2}).pdf$/
+const regexS3Key = /^statements\/[\w\d-]+\/(dbscredit|dbs|uobcredit|uob|poems)-(\d{4})-(\d{2}).pdf$/
 exports.handler = async (event) => {
   const s3key = event.Records[0].s3.object.key
 
@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     throw new Error(`[ERROR] Invalid s3 key ${s3key}`)
   }
 
-  const [uid] = s3key.split('/')
+  const [, uid, filename] = s3key.split('/')
 
   const data = await s3get({
     Bucket: 'jiewmeng-finances',
@@ -33,7 +33,7 @@ exports.handler = async (event) => {
   console.log('Downloaded S3 file')
   const now = DateTime.local().toUTC()
   const folder = `/tmp/${uid}`
-  const filepath = `/tmp/${s3key}`
+  const filepath = `/tmp/${uid}/${filename}`
 
   const folderExists = await exists(folder)
   if (!folderExists) {
