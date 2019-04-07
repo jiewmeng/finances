@@ -1,0 +1,16 @@
+.site-name {
+  color: #fff;
+  line-height: 64px;
+  float: left;
+  margin: 0 40px 0 0;
+}
+
+.layout-blank-wrapper {
+  max-width: 90vw;
+  width: 500px;
+  padding: 50px;
+  margin: 30px auto;
+  box-sizing: border-box;
+  background: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}

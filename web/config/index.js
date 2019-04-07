@@ -26,8 +26,8 @@ module.exports = function () {
     ...envConfig,
     ...localConfig
   }
-  // Object.keys(config).forEach((k) => {
-  //   config[k] = JSON.stringify(config[k])
-  // })
+  Object.keys(config).forEach((k) => {
+    config[k] = JSON.stringify(config[k])
+  })
   return config
 }

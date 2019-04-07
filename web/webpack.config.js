@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const ENV = process.env.NODE_ENV || ''
 const devMode = !ENV.match(/^staging|production$/)
+const config = require('./config')()
 
 module.exports = {
   mode: ENV.match(/^staging|production$/) ? 'production' : 'development',
@@ -70,6 +71,7 @@ module.exports = {
         to: '.'
       }
     ]),
+    new webpack.DefinePlugin(config)
   ],
   devServer: {
     contentBase: './assets',
