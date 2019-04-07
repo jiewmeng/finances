@@ -3,8 +3,6 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const postcssPresetEnv = require('postcss-preset-env')
-// const config = require('./config/_init')()
 
 const ENV = process.env.NODE_ENV || ''
 const devMode = !ENV.match(/^staging|production$/)
@@ -16,7 +14,7 @@ module.exports = {
     app: [
       '@babel/polyfill',
       'react-hot-loader/patch',
-      './scripts/app.js'
+      './js/app.js'
     ]
   },
   output: {
@@ -52,21 +50,6 @@ module.exports = {
         loaders: [
           devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
           'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: () => {
-                return [
-                  postcssPresetEnv({
-                    stage: 1,
-                    features: {
-                      'nesting-rules': true
-                    }
-                  })
-                ]
-              }
-            }
-          }
         ]
       },
     ]
@@ -87,7 +70,6 @@ module.exports = {
         to: '.'
       }
     ]),
-    // new webpack.DefinePlugin(config),
   ],
   devServer: {
     contentBase: './assets',
