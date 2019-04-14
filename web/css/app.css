@@ -14,3 +14,12 @@
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
 }
+
+.content-wrapper {
+  margin: 20px 0;
+}
+
+.ant-row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

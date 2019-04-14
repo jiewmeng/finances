@@ -19,6 +19,7 @@ import 'ant-design-pro/dist/ant-design-pro.css'
 import '../css/app.css'
 import LoginPage from './auth/LoginPage'
 import NotFoundPage from './NotFoundPage'
+import DashboardPage from './dashboard/DashboardPage'
 import AppContext from './AppContext'
 
 class App extends React.Component {
@@ -52,6 +53,7 @@ class App extends React.Component {
             <Content style={{ padding: '0 50px' }}>
               <Switch>
                 <Route path="/auth/login" exact component={LoginPage} />
+                <Route path="/" exact component={DashboardPage} />
                 <Route component={NotFoundPage} />
               </Switch>
             </Content>

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint scripts/**/*.js",
     "build": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server --hot --color --history-api-fallback --config webpack.config.js"
+    "dev": "NODE_ENV=development webpack-dev-server --hot --color --history-api-fallback --config webpack.config.js"
   },
   "author": "Jiew Meng <jiewmeng@gmail.com>",
   "license": "MIT",
