@@ -3,7 +3,8 @@ import { Row, Col, Button, Typography, Table, Card, Icon } from 'antd'
 import PageHeader from 'ant-design-pro/lib/PageHeader'
 import DescriptionList from 'ant-design-pro/lib/DescriptionList'
 import NumberInfo from 'ant-design-pro/lib/NumberInfo'
-import { ChartCard, MiniArea, TimelineChart } from 'ant-design-pro/lib/Charts'
+import { ChartCard, MiniArea } from 'ant-design-pro/lib/Charts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 export default class DashboardPage extends React.Component {
   render() {
@@ -245,68 +246,50 @@ export default class DashboardPage extends React.Component {
       },
     ]
 
-    const assetsData = [
+    const assetData = [
       {
-        x: '2018-11',
-        y1: '50000.50',
-        y2: '10000.00',
-        y3: '8000.00',
-        y4: '36600.00',
-        y5: '200.00',
-        y6: '1000.00',
-        y7: '20000.00',
+        date: '2018-10',
+        dbsBank: 59000,
+        uobBank: 12000,
+        stashaway: 7000,
+        poems: 26000
       },
       {
-        x: '2018-12',
-        y1: '51000.50',
-        y2: '10500.00',
-        y3: '8100.00',
-        y4: '36800.00',
-        y5: '300.00',
-        y6: '1200.00',
-        y7: '20100.00',
+        date: '2018-11',
+        dbsBank: 57000,
+        uobBank: 11500,
+        stashaway: 8500,
+        poems: 26000
       },
       {
-        x: '2019-01',
-        y1: '50000.50',
-        y2: '10000.00',
-        y3: '8000.00',
-        y4: '36600.00',
-        y5: '200.00',
-        y6: '1000.00',
-        y7: '20000.00',
+        date: '2018-12',
+        dbsBank: 59000,
+        uobBank: 12000,
+        stashaway: 9600,
+        poems: 26000
       },
       {
-        x: '2019-02',
-        y1: '52000.50',
-        y2: '12000.00',
-        y3: '8000.00',
-        y4: '36600.00',
-        y5: '200.00',
-        y6: '1000.00',
-        y7: '21000.00',
+        date: '2019-01',
+        dbsBank: 61000,
+        uobBank: 10000,
+        stashaway: 10000,
+        poems:30000
       },
       {
-        x: '2019-03',
-        y1: '53000.50',
-        y2: '13000.00',
-        y3: '8200.00',
-        y4: '36800.00',
-        y5: '500.00',
-        y6: '1200.00',
-        y7: '24000.00',
+        date: '2019-02',
+        dbsBank: 63000,
+        uobBank: 9000,
+        stashaway: 12000,
+        poems: 35000
+      },
+      {
+        date: '2019-03',
+        dbsBank: 65000,
+        uobBank: 7000,
+        stashaway: 15000,
+        poems: 36000
       },
     ]
-
-    const assetMap = {
-      y1: 'DBS Bank',
-      y2: 'UOB Bank',
-      y3: 'StashAway',
-      y4: 'POEMS',
-      y5: 'POSB Invest Saver',
-      y6: 'CDP',
-      y7: 'CPF',
-    }
 
     return (
       <React.Fragment>
@@ -332,7 +315,19 @@ export default class DashboardPage extends React.Component {
           <Row gutter={16}>
             <Col span={24}>
               <Card title="Assets (Bank + Investments)">
-                <TimelineChart height={360} data={assetsData} titleMap={assetMap} />
+                <ResponsiveContainer width="100%" height={360}>
+                  <BarChart data={assetData}>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <Bar stackId="a" type="monotone" name="DBS" dataKey="dbsBank" stroke="#a8071a" fill="#a8071a" strokeWidth={2} />
+                    <Bar stackId="a" type="monotone" name="UOB" dataKey="uobBank" stroke="#0050b3" fill="#0050b3" strokeWidth={2} />
+                    <Bar stackId="a" type="monotone" name="StashAway" dataKey="stashaway" stroke="#a0d911" fill="#a0d911" strokeWidth={2} />
+                    <Bar stackId="a" type="monotone" name="POEMS" dataKey="poems" stroke="#1890ff" fill="#1890ff" strokeWidth={2} />
+                  </BarChart>
+                </ResponsiveContainer>
               </Card>
             </Col>
           </Row>
