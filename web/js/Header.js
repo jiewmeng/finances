@@ -14,8 +14,9 @@ export default () => {
         const menu = isLoggedIn ? (
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
             <Menu.Item><Icon type="line-chart" />Dashboard</Menu.Item>
-            <Menu.Item><Icon type="table" />Transactions</Menu.Item>
-            <Menu.Item><Icon type="file" />Statements</Menu.Item>
+            <Menu.Item><Icon type="bank" />Bank</Menu.Item>
+            <Menu.Item><Icon type="dollar" />Invest</Menu.Item>
+            <Menu.Item><Icon type="credit-card" />Credit Card</Menu.Item>
           </Menu>
         ) : null
 

@@ -301,13 +301,13 @@ export default class DashboardPage extends React.Component {
               </ChartCard>
             </Col>
             <Col span={8}>
-            <ChartCard title="Credit Card" total="600.00">
-                <MiniArea line height={60} data={creditCardSpending}></MiniArea>
+              <ChartCard title="Investments" total="60,000.00">
+                <MiniArea line height={60} data={investments}></MiniArea>
               </ChartCard>
             </Col>
             <Col span={8}>
-            <ChartCard title="Investments" total="60,000.00">
-                <MiniArea line height={60} data={investments}></MiniArea>
+              <ChartCard title="Credit Card" total="600.00">
+                <MiniArea line height={60} data={creditCardSpending}></MiniArea>
               </ChartCard>
             </Col>
           </Row>

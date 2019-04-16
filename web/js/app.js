@@ -20,6 +20,7 @@ import '../css/app.css'
 import LoginPage from './auth/LoginPage'
 import NotFoundPage from './NotFoundPage'
 import DashboardPage from './dashboard/DashboardPage'
+import BankPage from './bank/BankPage'
 import AppContext from './AppContext'
 
 class App extends React.Component {
@@ -54,6 +55,7 @@ class App extends React.Component {
               <Switch>
                 <Route path="/auth/login" exact component={LoginPage} />
                 <Route path="/" exact component={DashboardPage} />
+                <Route path="/bank" exact component={BankPage} />
                 <Route component={NotFoundPage} />
               </Switch>
             </Content>
