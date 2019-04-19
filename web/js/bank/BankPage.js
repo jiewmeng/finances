@@ -1,11 +1,31 @@
 import React from 'react'
-import { Row, Col, Card, Table, DatePicker, Select, Form, Radio, Icon } from 'antd'
+import { Row, Col, Card, Table, DatePicker, Select, Form, Radio, Icon, Button, Drawer } from 'antd'
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 const { MonthPicker } = DatePicker
 const { Option } = Select
 
 export default class BankPage extends React.Component {
+  constructor(params) {
+    super(params)
+
+    this.state = {
+      isFilterVisible: false
+    }
+  }
+
+  toggleFilter = () => {
+    this.setState({
+      isFilterVisible: !this.state.isFilterVisible
+    })
+  }
+
+  onFilterClose = () => {
+    this.setState({
+      isFilterVisible: false
+    })
+  }
+
   render() {
     const data = [
       {
@@ -117,14 +137,24 @@ export default class BankPage extends React.Component {
           <Row gutter={16}>
             <Col span={24}>
               <Card title="Bank Balances" extra={(
-                <Radio.Group>
-                  <Radio.Button value="line">
-                    <Icon type="line-chart" />
-                  </Radio.Button>
-                  <Radio.Button value="stacked">
-                    <Icon type="bar-chart" />
-                  </Radio.Button>
-                </Radio.Group>
+                <Form layout="inline">
+                  <Form.Item>
+                    <Radio.Group>
+                      <Radio.Button value="line">
+                        <Icon type="line-chart" />
+                      </Radio.Button>
+                      <Radio.Button value="stacked">
+                        <Icon type="bar-chart" />
+                      </Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  <Form.Item>
+                    <Button onClick={this.toggleFilter}>
+                      <Icon type="filter" />
+                    </Button>
+                  </Form.Item>
+                </Form>
               )}>
 
                 <ResponsiveContainer width="100%" height={360}>
@@ -145,25 +175,32 @@ export default class BankPage extends React.Component {
           <Row gutter={16}>
             <Col span={24}>
               <Card title="Transactions">
-                <Form layout="inline">
-                  <Form.Item>
-                    <MonthPicker placeholder="Select month" />
-                  </Form.Item>
-                  <Form.Item>
-                  <Select defaultValue="">
-                    <Option value="">Any bank</Option>
-                    <Option value="dbs">DBS</Option>
-                    <Option value="uob">UOB</Option>
-                  </Select>
-                  </Form.Item>
-                </Form>
-
-
                <Table bordered size="middle" columns={txnTblColumns} dataSource={txnTblData} />
               </Card>
             </Col>
           </Row>
         </div>
+
+        <Drawer title="Filter" placement="right" closable visible={this.state.isFilterVisible} width={360} onClose={this.onFilterClose}>
+          <Form>
+            <Form.Item label="Month">
+              <MonthPicker placeholder="Select month" style={{ display: 'block' }} />
+            </Form.Item>
+            <Form.Item label="Bank">
+              <Select defaultValue="">
+                <Option value="">Any bank</Option>
+                <Option value="dbs">DBS</Option>
+                <Option value="uob">UOB</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item>
+              <Button block>
+                <Icon type="reload" />
+                Clear Filter
+              </Button>
+            </Form.Item>
+          </Form>
+        </Drawer>
       </React.Fragment>
     )
   }
