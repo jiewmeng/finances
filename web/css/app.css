@@ -23,3 +23,7 @@
   padding-top: 8px;
   padding-bottom: 8px;
 }
+
+.ant-form-item {
+  margin-bottom: 6px;
+}

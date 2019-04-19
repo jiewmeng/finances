@@ -31,6 +31,7 @@ class App extends React.Component {
           .then(token => {
             this.props.auth.setAuth({
               idToken: token,
+              displayPic: user.photoURL,
               displayName: user.displayName
             })
           })
@@ -39,6 +40,7 @@ class App extends React.Component {
           })
       } else {
         this.props.auth.setAuth(null)
+        if (location.pathname !== '/auth/login') location = '/auth/login'
         console.info('AUTH STATE LOGGED OUT')
       }
     })
@@ -78,11 +80,12 @@ class Wrapper extends React.Component {
         idToken: '',
       },
       setAuth: (data) => {
-        if (data.displayName && data.idToken) {
+        if (data && data.displayName && data.idToken) {
           this.setState({
             auth: {
               displayName: data.displayName,
-              idToken: data.idToken
+              idToken: data.idToken,
+              displayPic: data.displayPic
             }
           })
         } else {
