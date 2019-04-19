@@ -11,6 +11,9 @@ export default class LoginPage extends React.Component {
   login = async () => {
     const googleProvider = new firebase.auth.GoogleAuthProvider()
     await firebase.auth().signInWithPopup(googleProvider)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   render() {
