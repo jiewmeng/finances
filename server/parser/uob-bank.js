@@ -245,6 +245,8 @@ module.exports = function (buf) {
         statementYearMonth: statementDate.toFormat('yyyyMM'),
         startDate: statementDate.startOf('month').toFormat('yyyy-MM-dd'),
         endDate: statementDate.endOf('month').toFormat('yyyy-MM-dd'),
+        type: 'Bank',
+        subType: 'UOB',
         accounts
       }
     })

@@ -92,6 +92,8 @@ module.exports = function (buf) {
           statementDate = DateTime.fromFormat(accountDetailsLine[1].str, 'dd MMM yyyy')
           statementData.statementId = `${statementDate.toFormat('yyyy-MM')}-dbs`
           statementData.statementYearMonth = statementDate.toFormat('yyyyMM')
+          statementData.type = 'Bank'
+          statementData.subType = 'DBS'
           statementData.startDate = statementDate.startOf('month').toFormat('yyyy-MM-dd')
           statementData.endDate = statementDate.endOf('month').toFormat('yyyy-MM-dd')
         }

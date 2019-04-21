@@ -146,6 +146,8 @@ exports.handler = async (event) => {
             status: { S: 'DONE' },
             statementId: { S: statement.statementId },
             startDate: { S: statement.startDate },
+            type: { S: statement.type },
+            subType: { S: statement.subType },
             endDate: { S: statement.endDate },
             accounts: {
               L: Object.keys(statement.accounts).map(accountId => {
