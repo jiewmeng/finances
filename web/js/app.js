@@ -29,6 +29,7 @@ class App extends React.Component {
       if (user) {
         user.getIdToken(true)
           .then(token => {
+            console.log('idToken', token)
             this.props.auth.setAuth({
               idToken: token,
               displayPic: user.photoURL,

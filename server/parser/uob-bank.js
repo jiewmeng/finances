@@ -241,7 +241,8 @@ module.exports = function (buf) {
 
       const date = DateTime.fromFormat(`${statementYearMonth}01`, 'yyyyMMdd')
       return {
-        statementId: `uob-bank-${statementYearMonth}`,
+        statementId: `uob-${statementDate.toFormat('yyyy-MM')}`,
+        statementYearMonth: statementDate.toFormat('yyyyMM'),
         startDate: statementDate.startOf('month').toFormat('yyyy-MM-dd'),
         endDate: statementDate.endOf('month').toFormat('yyyy-MM-dd'),
         accounts

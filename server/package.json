@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:layer": "rm -rf build/layer; mkdir build/layer build/layer/nodejs; cp package*.json build/layer/nodejs; (cd build/layer/nodejs; npm i) && (cd build/layer; zip -r ./nodemodules.zip .)",
     "build": "rm -rf build/source; mkdir build/source; cp -R parser index.js build/source && (cd build/source; zip -r ./source.zip .)",
+    "build:api": "rm -rf build/api; mkdir build/api; cp -R api build/api && (cd build/api; zip -r ./api.zip .)",
+    "build:api:layer": "rm -rf build/api-layer; mkdir build/api-layer build/api-layer/nodejs; cp api/package*.json build/api-layer/nodejs; (cd build/api-layer/nodejs; npm i) && (cd build/api-layer; zip -r ./api-nodemodules.zip .)",
     "deploy": "",
     "tf:init": "(cd terraform; terraform init -backend-config=env/dev.backend.config)",
     "tf:plan": "(cd terraform; terraform plan -var-file=env/dev.tfvars -out plan.out)",

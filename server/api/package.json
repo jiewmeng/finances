@@ -1,0 +1,15 @@
+{
+  "name": "finances-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^7.3.0",
+    "lambda-multipart-parser": "0.0.2"
+  }
+}

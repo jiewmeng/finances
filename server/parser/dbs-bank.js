@@ -33,7 +33,7 @@ module.exports = function (buf) {
        *        description,
        *        balance,
        *        category,
-       *        statement,   // eg. dbs-bank-YYYYMM
+       *        statement,   // eg. dbs-YYYYMM
        *        accountName,
        *        accountNumber,
        *        amount,
@@ -74,20 +74,27 @@ module.exports = function (buf) {
         // Find for ACCOUNT DETAILS (to get date)
         const accountDetails = contentArea.find(item => item.str.match(regexAccountDetails))
         if (!accountDetails) {
-          throw new Error('Cannot find account details line')
-        }
-        const accountDetailsLine = contentArea.filter(item => item.transform[5] === accountDetails.transform[5])
-        if (accountDetailsLine.length !== 2) {
-          throw new Error('Unexpected number for account details line')
-        }
-        if (!accountDetailsLine[1].str.match(/^\d{2} \w{3} \d{4}$/)) {
-          throw new Error('Incorrect date format for account details line')
-        }
+          if (!statementDate) {
+            // console.error('Cannot find account details line')
+            throw new Error('Cannot find account details line')
+          }
+        } else {
+          const accountDetailsLine = contentArea.filter(item => item.transform[5] === accountDetails.transform[5])
+          if (accountDetailsLine.length !== 2) {
+            console.error('Unexpected number for account details line')
+            throw new Error('Unexpected number for account details line')
+          }
+          if (!accountDetailsLine[1].str.match(/^\d{2} \w{3} \d{4}$/)) {
+            console.error('Incorrect date format for account details line')
+            throw new Error('Incorrect date format for account details line')
+          }
 
-        statementDate = DateTime.fromFormat(accountDetailsLine[1].str, 'dd MMM yyyy')
-        statementData.statementId = `dbs-bank-${statementDate.toFormat('yyyyMM')}`
-        statementData.startDate = statementDate.startOf('month').toFormat('yyyy-MM-dd')
-        statementData.endDate = statementDate.endOf('month').toFormat('yyyy-MM-dd')
+          statementDate = DateTime.fromFormat(accountDetailsLine[1].str, 'dd MMM yyyy')
+          statementData.statementId = `dbs-${statementDate.toFormat('yyyy-MM')}`
+          statementData.statementYearMonth = statementDate.toFormat('yyyyMM')
+          statementData.startDate = statementDate.startOf('month').toFormat('yyyy-MM-dd')
+          statementData.endDate = statementDate.endOf('month').toFormat('yyyy-MM-dd')
+        }
 
         // Find for "Account No." (start of account details)
         const accNoItems = contentArea.filter(item => item.str.match(regexAccountNo))
@@ -261,7 +268,6 @@ module.exports = function (buf) {
       const idPrefix = `cash-dbs${statementDate.toFormat('yyyyMM')}`
 
       Object.keys(statementData.accounts).forEach((accountId) => {
-        console.log(accountId)
         const accIdForPrefix = accountId.toLowerCase().replace(/[\s-]/g, '')
 
         statementData.accounts[accountId].transactions.forEach((txn, i) => {
@@ -290,7 +296,6 @@ module.exports = function (buf) {
           }
 
           txn.amount = txn.deposit - txn.withdrawal
-          // txn.statement = `dbs-bank-${statementDate.toFormat('yyyyMM')}`
           txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
           delete txn.accountName
           delete txn.accountNumber
