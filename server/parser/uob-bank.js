@@ -186,7 +186,7 @@ module.exports = function (buf) {
 
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
     .then(() => {
-      const idPrefix = `cash-uob${statementDate.toFormat('yyyyMM')}`
+      const idPrefix = `cash-${statementDate.toFormat('yyyyMM')}-uob`
 
       // Compute interests and other fields
       Object.keys(accounts).forEach(account => {
@@ -241,7 +241,7 @@ module.exports = function (buf) {
 
       const date = DateTime.fromFormat(`${statementYearMonth}01`, 'yyyyMMdd')
       return {
-        statementId: `uob-${statementDate.toFormat('yyyy-MM')}`,
+        statementId: `${statementDate.toFormat('yyyy-MM')}-uob`,
         statementYearMonth: statementDate.toFormat('yyyyMM'),
         startDate: statementDate.startOf('month').toFormat('yyyy-MM-dd'),
         endDate: statementDate.endOf('month').toFormat('yyyy-MM-dd'),

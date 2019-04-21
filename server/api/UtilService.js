@@ -4,7 +4,6 @@ module.exports = class UtilService {
   static jsonResponse(event, data, statusCode = 200) {
     const corsOrigins = process.env.CORS_ORIGINS || ''
     const corsUrls = corsOrigins.split(',').map(h => h.trim())
-    console.log('event.headers', event.headers)
     const requestOrigin = event.headers ? event.headers.origin : ''
 
     if (!requestOrigin || corsOrigins === '*' || corsUrls.includes(requestOrigin)) {
@@ -21,8 +20,6 @@ module.exports = class UtilService {
       }
     }
 
-    console.log(`CORS_DENY: ${process.env.CORS_ORIGINS}`)
-    console.log(`CORS_DENY: ${requestOrigin}`)
     return {
       statusCode: 403,
       body: JSON.stringify({ message: 'Deny by CORS' })
@@ -41,5 +38,33 @@ module.exports = class UtilService {
     return UtilService.jsonResponse(event, {
       message: err.message
     }, 500)
+  }
+
+  static transformDynamoQueryResult(result) {
+    const data = result.Items.map(item => {
+      const obj = {}
+      Object.keys(item).forEach(k => {
+        Object.keys(item[k]).forEach(t => {
+          switch (t) {
+            case 'N':
+              obj[k] = parseFloat(item[k][t])
+              break
+            case 'S':
+            default:
+              obj[k] = item[k][t]
+          }
+        })
+      })
+      return obj
+    })
+
+    return {
+      data,
+      dynamodb: {
+        count: result.Count,
+        scannedCount: result.ScannedCount,
+        consumedCapacity: result.ConsumedCapacity.CapacityUnits
+      }
+    }
   }
 }

@@ -48,6 +48,25 @@ resource "aws_lambda_layer_version" "lambda_api_layer_nodemodules" {
   source_code_hash = "${filebase64sha256("../build/api-layer/api-nodemodules.zip")}"
 }
 
+# GET /statements
+resource "aws_lambda_function" "api_statements_list" {
+  function_name = "finances-api-statements-get"
+  handler = "api/statements/list.handler"
+  filename = "../build/api/api.zip"
+  source_code_hash = "${filebase64sha256("../build/api/api.zip")}"
+  layers = ["${aws_lambda_layer_version.lambda_api_layer_nodemodules.arn}"]
+  runtime = "nodejs8.10"
+  role = "${aws_iam_role.aws_iam_role_lambda.arn}"
+  timeout = 20
+  reserved_concurrent_executions = 5
+  publish = true
+  environment = {
+    variables = {
+      CORS_ORIGINS = "${var.cors_origins}"
+    }
+  }
+}
+
 # POST /statements
 resource "aws_lambda_function" "api_statements_upload" {
   function_name = "finances-api-statements-post"

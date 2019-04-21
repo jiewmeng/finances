@@ -90,7 +90,7 @@ module.exports = function (buf) {
           }
 
           statementDate = DateTime.fromFormat(accountDetailsLine[1].str, 'dd MMM yyyy')
-          statementData.statementId = `dbs-${statementDate.toFormat('yyyy-MM')}`
+          statementData.statementId = `${statementDate.toFormat('yyyy-MM')}-dbs`
           statementData.statementYearMonth = statementDate.toFormat('yyyyMM')
           statementData.startDate = statementDate.startOf('month').toFormat('yyyy-MM-dd')
           statementData.endDate = statementDate.endOf('month').toFormat('yyyy-MM-dd')
@@ -265,7 +265,7 @@ module.exports = function (buf) {
 
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
     .then(() => {
-      const idPrefix = `cash-dbs${statementDate.toFormat('yyyyMM')}`
+      const idPrefix = `cash-${statementDate.toFormat('yyyyMM')}-dbs`
 
       Object.keys(statementData.accounts).forEach((accountId) => {
         const accIdForPrefix = accountId.toLowerCase().replace(/[\s-]/g, '')

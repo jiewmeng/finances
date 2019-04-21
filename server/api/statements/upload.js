@@ -26,7 +26,9 @@ exports.handler = async (event) => {
       Bucket: bucket,
       Key: key
     })
-    const statementId = body.files[0].filename
+    let statementId = path.basename(body.files[0].filename, '.pdf')
+    const statementIdMatches = /^(.*)-(\d{4}-\d{2})$/.exec(statementId)
+    statementId = `${statementIdMatches[2]}-${statementIdMatches[1]}`
 
     await dynamodbBatchWrite({
       RequestItems: {
@@ -35,7 +37,7 @@ exports.handler = async (event) => {
             PutRequest: {
               Item: {
                 user: { S: 'jiewmeng' },
-                statementId: { S: path.basename(body.files[0].filename, '.pdf') },
+                statementId: { S: statementId },
                 status: { S: 'UPLOADED' }
               }
             }
