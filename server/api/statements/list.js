@@ -11,7 +11,9 @@ exports.handler = async (event) => {
       TableName: 'finances-statements',
       AttributesToGet: [
         'statementId',
-        'status'
+        'status',
+        'type',
+        'subType',
       ],
       Select: 'SPECIFIC_ATTRIBUTES',
       Limit: 200,
