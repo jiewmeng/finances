@@ -18,6 +18,33 @@ const dynamodbPutItem = util.promisify(dynamodb.putItem).bind(dynamodb)
 const dynamodbUpdateItem = util.promisify(dynamodb.updateItem).bind(dynamodb)
 const dynamodbQuery = util.promisify(dynamodb.query).bind(dynamodb)
 
+const CHUNK_SIZE = 25
+function getBatchWrites(arr) {
+  const chunks = []
+  for (i = 0; i < arr.length; i += CHUNK_SIZE) {
+    chunks.push(arr.slice(i, i + CHUNK_SIZE))
+  }
+
+  // Prep chunks for dynamodb batch write
+  const batches = chunks.map(chunk => {
+    const batch = {
+      RequestItems: {},
+      ReturnConsumedCapacity: 'TOTAL'
+    }
+    chunk.forEach(item => {
+      Object.keys(item).forEach(k => {
+        if (!(k in batch.RequestItems)) {
+          batch.RequestItems[k] = []
+        }
+        batch.RequestItems[k].push(item[k])
+      })
+    })
+
+    return batch
+  })
+  return batches
+}
+
 // const regexS3Key = /^statements\/[\w\d-]+\/(dbscredit|dbs|uobcredit|uob|poems)-(\d{4})-(\d{2}).pdf$/
 const regexS3Key = /^statements\/[\w\d-]+\/(dbs|uob)-(\d{4})-(\d{2}).pdf$/
 exports.handler = async (event) => {
@@ -139,41 +166,42 @@ exports.handler = async (event) => {
         return
       }
 
+      const itemsToWrite = []
+
+
       // write statement record
-      const statementItem = {
-        'finances-statements': [
-          {
-            PutRequest: {
-              Item: {
-                user: { S: uid },
-                status: { S: 'DONE' },
-                statementId: { S: statement.statementId },
-                startDate: { S: statement.startDate },
-                type: { S: statement.type },
-                subType: { S: statement.subType },
-                endDate: { S: statement.endDate },
-                accounts: {
-                  L: Object.keys(statement.accounts).map(accountId => {
-                    return {
-                      M: {
-                        name: { S: accountId },
-                        startingBalance: { N: statement.accounts[accountId].startingBalance.toFixed(2) },
-                        endingBalance: { N: statement.accounts[accountId].endingBalance.toFixed(2) }
-                      }
+      itemsToWrite.push({
+        'finances-statements': {
+          PutRequest: {
+            Item: {
+              user: { S: uid },
+              status: { S: 'DONE' },
+              statementId: { S: statement.statementId },
+              startDate: { S: statement.startDate },
+              type: { S: statement.type },
+              subType: { S: statement.subType },
+              endDate: { S: statement.endDate },
+              accounts: {
+                L: Object.keys(statement.accounts).map(accountId => {
+                  return {
+                    M: {
+                      name: { S: accountId },
+                      startingBalance: { N: statement.accounts[accountId].startingBalance.toFixed(2) },
+                      endingBalance: { N: statement.accounts[accountId].endingBalance.toFixed(2) }
                     }
-                  })
-                }
+                  }
+                })
               }
             }
           }
-        ]
-      }
+        }
+      })
 
       // write transactions records
-      const transactionItems = {
-        'finances-transactions': [].concat(...Object.keys(statement.accounts).map(accountId => {
-          return statement.accounts[accountId].transactions.map(txn => {
-            return {
+      Object.keys(statement.accounts).forEach(accountId => {
+        statement.accounts[accountId].transactions.forEach(txn => {
+          itemsToWrite.push({
+            'finances-transactions': {
               PutRequest: {
                 Item: {
                   user: { S: uid },
@@ -189,12 +217,13 @@ exports.handler = async (event) => {
               }
             }
           })
-        }))
-      }
+        })
+      })
 
-      const dayAggItems = {
-        'finances-day-aggregations': Object.keys(dayGroups).map(date => {
-          return {
+      // Day aggregations
+      Object.keys(dayGroups).forEach(date => {
+        itemsToWrite.push({
+          'finances-day-aggregations': {
             PutRequest: {
               Item: {
                 user: { S: uid },
@@ -205,35 +234,26 @@ exports.handler = async (event) => {
             }
           }
         })
-      }
+      })
 
-      const logItems = {
-        'finances-logs': [
-          {
-            PutRequest: {
-              Item: {
-                timestamp: { N: String(Date.now()) },
-                user: { S: uid },
-                action: { S: `[SUCCESS] Finished parsing ${statement.statementId}` }
-              }
+      // Log items
+      itemsToWrite.push({
+        'finances-logs': {
+          PutRequest: {
+            Item: {
+              timestamp: { N: String(Date.now()) },
+              user: { S: uid },
+              action: { S: `[SUCCESS] Finished parsing ${statement.statementId}` }
             }
           }
-        ]
-      }
+        }
+      })
 
-      const dataToWrite = {
-        RequestItems: {
-          ...statementItem,
-          ...transactionItems,
-          ...dayAggItems,
-          ...logItems
-        },
-        ReturnConsumedCapacity: 'TOTAL'
-      }
-      // console.log(JSON.stringify(dataToWrite))
+      const batches = getBatchWrites(itemsToWrite)
 
-      const writeResult = await dynamodbBatchWrite(dataToWrite)
-      console.log(writeResult)
+      batches.forEach(async (batch) => {
+        await dynamodbBatchWrite(batch)
+      })
     } catch (err) {
       // Should update user statement status
       console.error(`[ERROR] ${err.message}`)
