@@ -42,8 +42,12 @@ exports.handler = async (event) => {
     }
 
     const tokenData = await admin.auth().verifyIdToken(tokenMatches[1], true)
-    if (tokenData.user_id === 'FrMd6Wqch8XJm32HihF14tl6Wui2' && tokenData.email === 'jiewmeng@gmail.com') {
-      return createPolicy('jiewmeng', 'Allow', [`arn:aws:execute-api:*:*:${process.env.API_ID}/*`])
+    if (tokenData.uid === 'FrMd6Wqch8XJm32HihF14tl6Wui2' && tokenData.email === 'jiewmeng@gmail.com') {
+      return createPolicy(tokenData.uid, 'Allow', [`arn:aws:execute-api:*:*:${process.env.API_ID}/*`], {
+        uid: tokenData.uid,
+        email: tokenData.email,
+        name: tokenData.name
+      })
     }
     throw new Error('Unauthorized')
   } catch (err) {

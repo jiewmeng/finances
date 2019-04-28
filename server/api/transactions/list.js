@@ -8,15 +8,9 @@ exports.handler = async (event) => {
   const uid = event.requestContext.authorizer.uid
 
   try {
-    const statementsResult = await dynamodbQuery({
-      TableName: 'finances-statements',
-      AttributesToGet: [
-        'statementId',
-        'status',
-        'type',
-        'subType',
-      ],
-      Select: 'SPECIFIC_ATTRIBUTES',
+    const result = await dynamodbQuery({
+      TableName: 'finances-transactions',
+      Select: 'ALL_ATTRIBUTES',
       Limit: 50,
       ConsistentRead: false,
       KeyConditions: {
@@ -25,12 +19,18 @@ exports.handler = async (event) => {
           AttributeValueList: [{
             S: uid
           }]
+        },
+        txnid: {
+          ComparisonOperator: 'BEGINS_WITH',
+          AttributeValueList: [{
+            S: 'cash-'
+          }]
         }
       },
       ScanIndexForward: false,
       ReturnConsumedCapacity: 'TOTAL'
     })
-    const data = UtilService.transformDynamoQueryResult(statementsResult)
+    const data = UtilService.transformDynamoQueryResult(result)
 
     return UtilService.jsonResponse(event, data)
   } catch (err) {

@@ -45,6 +45,7 @@ exports.handler = async (event) => {
 
   await writeFile(filepath, data.Body)
   const statement = await Parser.parse(filepath)
+  console.log(JSON.stringify(statement))
 
   // Compute day aggregates
   const transactionsFlattened = [].concat(...Object.keys(statement.accounts).map(accountId => {
@@ -225,6 +226,7 @@ exports.handler = async (event) => {
     },
     ReturnConsumedCapacity: 'TOTAL'
   }
+  console.log(JSON.stringify(dataToWrite))
 
   const writeResult = await dynamodbBatchWrite(dataToWrite)
   console.log(writeResult)

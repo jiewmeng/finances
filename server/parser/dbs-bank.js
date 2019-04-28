@@ -299,8 +299,6 @@ module.exports = function (buf) {
 
           txn.amount = txn.deposit - txn.withdrawal
           txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
-          delete txn.accountName
-          delete txn.accountNumber
           delete txn.deposit
           delete txn.withdrawal
         })

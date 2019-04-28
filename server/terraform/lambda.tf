@@ -87,6 +87,64 @@ resource "aws_lambda_function" "api_statements_upload" {
   }
 }
 
+# GET /transactions
+resource "aws_lambda_function" "api_transactions_list" {
+  function_name = "finances-api-transactions-get"
+  handler = "api/transactions/list.handler"
+  filename = "../build/api/api.zip"
+  source_code_hash = "${filebase64sha256("../build/api/api.zip")}"
+  layers = ["${aws_lambda_layer_version.lambda_api_layer_nodemodules.arn}"]
+  runtime = "nodejs8.10"
+  role = "${aws_iam_role.aws_iam_role_lambda.arn}"
+  timeout = 20
+  reserved_concurrent_executions = 5
+  publish = true
+  environment = {
+    variables = {
+      CORS_ORIGINS = "${var.cors_origins}"
+    }
+  }
+}
+
+# GET /logs
+resource "aws_lambda_function" "api_logs_list" {
+  function_name = "finances-api-logs-get"
+  handler = "api/logs/list.handler"
+  filename = "../build/api/api.zip"
+  source_code_hash = "${filebase64sha256("../build/api/api.zip")}"
+  layers = ["${aws_lambda_layer_version.lambda_api_layer_nodemodules.arn}"]
+  runtime = "nodejs8.10"
+  role = "${aws_iam_role.aws_iam_role_lambda.arn}"
+  timeout = 20
+  reserved_concurrent_executions = 5
+  publish = true
+  environment = {
+    variables = {
+      CORS_ORIGINS = "${var.cors_origins}"
+    }
+  }
+}
+
+# GET /aggregations
+resource "aws_lambda_function" "api_aggregations_by-day" {
+  function_name = "finances-api-aggregations-by-day"
+  handler = "api/aggregations/by-day.handler"
+  filename = "../build/api/api.zip"
+  source_code_hash = "${filebase64sha256("../build/api/api.zip")}"
+  layers = ["${aws_lambda_layer_version.lambda_api_layer_nodemodules.arn}"]
+  runtime = "nodejs8.10"
+  role = "${aws_iam_role.aws_iam_role_lambda.arn}"
+  timeout = 20
+  reserved_concurrent_executions = 5
+  publish = true
+  environment = {
+    variables = {
+      CORS_ORIGINS = "${var.cors_origins}"
+    }
+  }
+}
+
+
 # API Gateway Authorizer
 resource "aws_lambda_function" "authorizer" {
   function_name = "finances-api-authorizer"

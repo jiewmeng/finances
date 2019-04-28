@@ -7,6 +7,8 @@ const UtilService = require('../UtilService')
 const StatementService = require('./StatementService')
 
 exports.handler = async (event) => {
+  const uid = event.requestContext.authorizer.uid
+
   const S3 = new AWS.S3()
   const s3PutObject = util.promisify(S3.putObject).bind(S3)
 
@@ -20,7 +22,7 @@ exports.handler = async (event) => {
 
     // Write file to S3
     const bucket = process.env.S3_BUCKET
-    const key = `statements/jiewmeng/${body.files[0].filename}`
+    const key = `statements/${uid}/${body.files[0].filename}`
     const resp = await s3PutObject({
       Body: body.files[0].content,
       Bucket: bucket,
@@ -36,7 +38,7 @@ exports.handler = async (event) => {
           {
             PutRequest: {
               Item: {
-                user: { S: 'jiewmeng' },
+                user: { S: uid },
                 statementId: { S: statementId },
                 status: { S: 'UPLOADED' }
               }
@@ -48,7 +50,7 @@ exports.handler = async (event) => {
             PutRequest: {
               Item: {
                 timestamp: { N: String(Date.now()) },
-                user: { S: 'jiewmeng' },
+                user: { S: uid },
                 action: { S: `Uploaded statement ${path.basename(body.files[0].filename, '.pdf')}` }
               }
             }
