@@ -13,7 +13,8 @@ data "aws_iam_policy_document" "iam_policy_doc_lambda" {
     effect = "Allow"
     actions = [
       "s3:PutObject",
-      "s3:GetObject"
+      "s3:GetObject",
+      "s3:DeleteObject"
     ]
     resources = [
       "arn:aws:s3:::jiewmeng-finances/statements/*"
