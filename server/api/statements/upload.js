@@ -22,46 +22,61 @@ exports.handler = async (event) => {
 
     // Write file to S3
     const bucket = process.env.S3_BUCKET
-    const key = `statements/${uid}/${body.files[0].filename}`
-    const resp = await s3PutObject({
-      Body: body.files[0].content,
-      Bucket: bucket,
-      Key: key
-    })
-    let statementId = path.basename(body.files[0].filename, '.pdf')
-    const statementIdMatches = /^(.*)-(\d{4}-\d{2})$/.exec(statementId)
-    statementId = `${statementIdMatches[2]}-${statementIdMatches[1]}`
 
-    await dynamodbBatchWrite({
-      RequestItems: {
-        'finances-statements': [
-          {
-            PutRequest: {
-              Item: {
-                user: { S: uid },
-                statementId: { S: statementId },
-                status: { S: 'UPLOADED' }
-              }
-            }
-          }
-        ],
-        'finances-logs': [
-          {
-            PutRequest: {
-              Item: {
-                timestamp: { N: String(Date.now()) },
-                user: { S: uid },
-                action: { S: `Uploaded statement ${path.basename(body.files[0].filename, '.pdf')}` }
-              }
-            }
-          }
-        ]
-      },
-      ReturnConsumedCapacity: 'TOTAL'
-    })
+    const results = await Promise.all(body.files.map(file => {
+      return new Promise(async (resolve, reject) => {
+        const key = `statements/${uid}/${file.filename}`
+        console.log(`Processing ${key} ...`)
+        try {
+          const resp = await s3PutObject({
+            Body: file.content,
+            Bucket: bucket,
+            Key: key
+          })
+          let statementId = path.basename(file.filename, '.pdf')
+          const statementIdMatches = /^(.*)-(\d{4}-\d{2})$/.exec(statementId)
+          statementId = `${statementIdMatches[2]}-${statementIdMatches[1]}`
+
+          const result = await dynamodbBatchWrite({
+            RequestItems: {
+              'finances-statements': [
+                {
+                  PutRequest: {
+                    Item: {
+                      user: { S: uid },
+                      statementId: { S: statementId },
+                      status: { S: 'UPLOADED' }
+                    }
+                  }
+                }
+              ],
+              'finances-logs': [
+                {
+                  PutRequest: {
+                    Item: {
+                      timestamp: { N: String(Date.now()) },
+                      user: { S: uid },
+                      action: { S: `Uploaded statement ${path.basename(file.filename, '.pdf')}` }
+                    }
+                  }
+                }
+              ]
+            },
+            ReturnConsumedCapacity: 'TOTAL'
+          })
+          console.log(`${key} DONE!`)
+          console.log(result)
+          resolve(`${key} DONE!`)
+        } catch (err) {
+          console.error(`[ERROR] Failed ${key}: ${err.message}`)
+          resolve(`${key} ERROR: ${err.message}`)
+        }
+      })
+    }))
 
     return UtilService.jsonResponse(event, {
-      message: `Uploaded file to s3://${bucket}/${key}`
+      message: 'done',
+      details: results
     })
   } catch (err) {
     return UtilService.handleError(event, err)

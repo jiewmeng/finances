@@ -48,64 +48,201 @@ exports.handler = async (event) => {
     await writeFile(filepath, data.Body)
     const statement = await Parser.parse(filepath)
 
-    // Compute day aggregates
-    const transactionsFlattened = [].concat(...Object.keys(statement.accounts).map(accountId => {
-      return statement.accounts[accountId].transactions.map(txn => {
-        return {
-          date: txn.date,
-          amount: txn.amount,
-          balance: txn.balance
-        }
+    try {
+      // Compute day aggregates
+      const transactionsFlattened = [].concat(...Object.keys(statement.accounts).map(accountId => {
+        return statement.accounts[accountId].transactions.map(txn => {
+          return {
+            date: txn.date,
+            amount: txn.amount,
+            balance: txn.balance
+          }
+        })
+      })).sort((a, b) => {
+        if (a.date > b.date) return 1
+        if (a.date < b.date) return -1
+        return 0
       })
-    })).sort((a, b) => {
-      if (a.date > b.date) return 1
-      if (a.date < b.date) return -1
-      return 0
-    })
 
-    const startingBalance = Object.keys(statement.accounts).reduce((sum, accountId) => {
-      return statement.accounts[accountId].startingBalance += sum
-    }, 0)
-    let currBalance = startingBalance
+      const startingBalance = Object.keys(statement.accounts).reduce((sum, accountId) => {
+        return statement.accounts[accountId].startingBalance += sum
+      }, 0)
+      let currBalance = startingBalance
 
-    const dayGroups = {}
-    transactionsFlattened.forEach(txn => {
-      if (!(txn.date in dayGroups)) {
-        dayGroups[txn.date] = {
-          amount: 0,
-          balance: 0
+      const dayGroups = {}
+      transactionsFlattened.forEach(txn => {
+        if (!(txn.date in dayGroups)) {
+          dayGroups[txn.date] = {
+            amount: 0,
+            balance: 0
+          }
         }
+
+        dayGroups[txn.date].amount += txn.amount
+
+        currBalance += txn.amount
+        dayGroups[txn.date].balance = parseFloat(currBalance.toFixed(2))
+      })
+
+      // Check that statement filename and statement dates match
+      const [, , filenameYear, filenameMonth] = filenameMatches
+      const filenameYearMonth = `${filenameYear}${filenameMonth}`
+
+      if (filenameYearMonth !== statement.statementYearMonth) {
+        const msg = `Filename and statement year month mismatch. S3 Key: ${s3key}. Filename: ${filenameYearMonth}. Statement: ${statement.statementYearMonth}`
+
+        await dynamodbPutItem({
+          Item: {
+            timestamp: { N: String(Date.now()) },
+            user: { S: uid },
+            action: { S: `[ERROR] ${msg}` }
+          },
+          TableName: 'finances-logs',
+          ReturnConsumedCapacity: "TOTAL",
+        })
+
+        await dynamodbUpdateItem({
+          ExpressionAttributeNames: {
+            '#status': 'status'
+          },
+          ExpressionAttributeValues: {
+            ':status': { S: 'ERROR_YEAR_MONTH_MISMATCH' }
+          },
+          Key: {
+            'user': { S: uid },
+            'statementId': { S: statement.statementId }
+          },
+          UpdateExpression: 'SET #status = :status',
+          TableName: 'finances-statements'
+        })
+
+        throw new Error(`[ERROR] ${msg}`)
       }
 
-      dayGroups[txn.date].amount += txn.amount
-
-      currBalance += txn.amount
-      dayGroups[txn.date].balance = parseFloat(currBalance.toFixed(2))
-    })
-
-    // Check that statement filename and statement dates match
-    const [, , filenameYear, filenameMonth] = filenameMatches
-    const filenameYearMonth = `${filenameYear}${filenameMonth}`
-
-    if (filenameYearMonth !== statement.statementYearMonth) {
-      const msg = `Filename and statement year month mismatch. S3 Key: ${s3key}. Filename: ${filenameYearMonth}. Statement: ${statement.statementYearMonth}`
-
-      await dynamodbPutItem({
-        Item: {
-          timestamp: { N: String(Date.now()) },
-          user: { S: uid },
-          action: { S: `[ERROR] ${msg}` }
+      // Check if statement already exists (with DONE status)
+      const checkResult = await dynamodbQuery({
+        TableName: 'finances-statements',
+        KeyConditionExpression: '#user = :u and statementId = :sid',
+        ExpressionAttributeValues: {
+          ':u': { S: uid },
+          ':sid': { S: statement.statementId },
         },
-        TableName: 'finances-logs',
-        ReturnConsumedCapacity: "TOTAL",
+        ExpressionAttributeNames: {
+          '#user': 'user',
+        },
+        Limit: 1,
+        ReturnConsumedCapacity: 'TOTAL'
       })
 
+      if (checkResult.Count > 0 && checkResult.Items[0].status === 'DONE') {
+        console.log(`[STMT_EXISTS] Statement already exists (${statement.statementId}). Doing nothing.`)
+        return
+      }
+
+      // write statement record
+      const statementItem = {
+        'finances-statements': [
+          {
+            PutRequest: {
+              Item: {
+                user: { S: uid },
+                status: { S: 'DONE' },
+                statementId: { S: statement.statementId },
+                startDate: { S: statement.startDate },
+                type: { S: statement.type },
+                subType: { S: statement.subType },
+                endDate: { S: statement.endDate },
+                accounts: {
+                  L: Object.keys(statement.accounts).map(accountId => {
+                    return {
+                      M: {
+                        name: { S: accountId },
+                        startingBalance: { N: statement.accounts[accountId].startingBalance.toFixed(2) },
+                        endingBalance: { N: statement.accounts[accountId].endingBalance.toFixed(2) }
+                      }
+                    }
+                  })
+                }
+              }
+            }
+          }
+        ]
+      }
+
+      // write transactions records
+      const transactionItems = {
+        'finances-transactions': [].concat(...Object.keys(statement.accounts).map(accountId => {
+          return statement.accounts[accountId].transactions.map(txn => {
+            return {
+              PutRequest: {
+                Item: {
+                  user: { S: uid },
+                  txnid: { S: txn.id },
+                  date: { S: txn.date },
+                  description: { S: txn.description },
+                  accountName: { S: txn.accountName },
+                  accountNumber: { S: txn.accountNumber },
+                  balance: { N: txn.balance.toFixed(2) },
+                  category: { S: txn.category },
+                  amount: { N: txn.amount.toFixed(2) },
+                }
+              }
+            }
+          })
+        }))
+      }
+
+      const dayAggItems = {
+        'finances-day-aggregations': Object.keys(dayGroups).map(date => {
+          return {
+            PutRequest: {
+              Item: {
+                user: { S: uid },
+                dateAndStatement: { S: `${date}-${statement.statementId}` },
+                amount: { N: dayGroups[date].amount.toFixed(2) },
+                balance: { N: dayGroups[date].balance.toFixed(2) }
+              }
+            }
+          }
+        })
+      }
+
+      const logItems = {
+        'finances-logs': [
+          {
+            PutRequest: {
+              Item: {
+                timestamp: { N: String(Date.now()) },
+                user: { S: uid },
+                action: { S: `[SUCCESS] Finished parsing ${statement.statementId}` }
+              }
+            }
+          }
+        ]
+      }
+
+      const dataToWrite = {
+        RequestItems: {
+          ...statementItem,
+          ...transactionItems,
+          ...dayAggItems,
+          ...logItems
+        },
+        ReturnConsumedCapacity: 'TOTAL'
+      }
+      // console.log(JSON.stringify(dataToWrite))
+
+      const writeResult = await dynamodbBatchWrite(dataToWrite)
+      console.log(writeResult)
+    } catch (err) {
+      // Should update user statement status
+      console.error(`[ERROR] ${err.message}`)
       await dynamodbUpdateItem({
         ExpressionAttributeNames: {
           '#status': 'status'
         },
         ExpressionAttributeValues: {
-          ':status': { S: 'ERROR_YEAR_MONTH_MISMATCH' }
+          ':status': { S: `ERROR: ${err.message}` }
         },
         Key: {
           'user': { S: uid },
@@ -114,123 +251,7 @@ exports.handler = async (event) => {
         UpdateExpression: 'SET #status = :status',
         TableName: 'finances-statements'
       })
-
-      throw new Error(`[ERROR] ${msg}`)
     }
-
-    // Check if statement already exists (with DONE status)
-    const checkResult = await dynamodbQuery({
-      TableName: 'finances-statements',
-      KeyConditionExpression: '#user = :u and statementId = :sid',
-      ExpressionAttributeValues: {
-        ':u': { S: uid },
-        ':sid': { S: statement.statementId },
-      },
-      ExpressionAttributeNames: {
-        '#user': 'user',
-      },
-      Limit: 1,
-      ReturnConsumedCapacity: 'TOTAL'
-    })
-
-    if (checkResult.Count > 0 && checkResult.Items[0].status === 'DONE') {
-      console.log(`[STMT_EXISTS] Statement already exists (${statement.statementId}). Doing nothing.`)
-      return
-    }
-
-    // write statement record
-    const statementItem = {
-      'finances-statements': [
-        {
-          PutRequest: {
-            Item: {
-              user: { S: uid },
-              status: { S: 'DONE' },
-              statementId: { S: statement.statementId },
-              startDate: { S: statement.startDate },
-              type: { S: statement.type },
-              subType: { S: statement.subType },
-              endDate: { S: statement.endDate },
-              accounts: {
-                L: Object.keys(statement.accounts).map(accountId => {
-                  return {
-                    M: {
-                      name: { S: accountId },
-                      startingBalance: { N: statement.accounts[accountId].startingBalance.toFixed(2) },
-                      endingBalance: { N: statement.accounts[accountId].endingBalance.toFixed(2) }
-                    }
-                  }
-                })
-              }
-            }
-          }
-        }
-      ]
-    }
-
-    // write transactions records
-    const transactionItems = {
-      'finances-transactions': [].concat(...Object.keys(statement.accounts).map(accountId => {
-        return statement.accounts[accountId].transactions.map(txn => {
-          return {
-            PutRequest: {
-              Item: {
-                user: { S: uid },
-                date: { S: txn.date },
-                description: { S: txn.description },
-                balance: { N: txn.balance.toFixed(2) },
-                category: { S: txn.category },
-                amount: { N: txn.amount.toFixed(2) },
-                txnid: { S: txn.id }
-              }
-            }
-          }
-        })
-      }))
-    }
-
-    const dayAggItems = {
-      'finances-day-aggregations': Object.keys(dayGroups).map(date => {
-        return {
-          PutRequest: {
-            Item: {
-              user: { S: uid },
-              dateAndStatement: { S: `${date}-${statement.statementId}` },
-              amount: { N: dayGroups[date].amount.toFixed(2) },
-              balance: { N: dayGroups[date].balance.toFixed(2) }
-            }
-          }
-        }
-      })
-    }
-
-    const logItems = {
-      'finances-logs': [
-        {
-          PutRequest: {
-            Item: {
-              timestamp: { N: String(Date.now()) },
-              user: { S: uid },
-              action: { S: `[SUCCESS] Finished parsing ${statement.statementId}` }
-            }
-          }
-        }
-      ]
-    }
-
-    const dataToWrite = {
-      RequestItems: {
-        ...statementItem,
-        ...transactionItems,
-        ...dayAggItems,
-        ...logItems
-      },
-      ReturnConsumedCapacity: 'TOTAL'
-    }
-    // console.log(JSON.stringify(dataToWrite))
-
-    const writeResult = await dynamodbBatchWrite(dataToWrite)
-    console.log(writeResult)
   } catch (err) {
     console.error('[ERROR]', err)
     throw err
