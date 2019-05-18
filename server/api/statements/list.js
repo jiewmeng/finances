@@ -15,6 +15,7 @@ exports.handler = async (event) => {
         'status',
         'type',
         'subType',
+        'uploadedOn',
       ],
       Select: 'SPECIFIC_ATTRIBUTES',
       Limit: 50,

@@ -11,8 +11,20 @@ resource "aws_dynamodb_table" "dynamodb-statements" {
   }
 
   attribute {
+    name = "uploadedOn"
+    type = "N"
+  }
+
+  attribute {
     name = "statementId"
     type = "S"
+  }
+
+  local_secondary_index {
+    name = "finances-logs-uploadedOn"
+    range_key = "uploadedOn"
+    projection_type = "INCLUDE"
+    non_key_attributes = ["statementId", "status"]
   }
 }
 

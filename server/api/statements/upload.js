@@ -2,6 +2,7 @@ const util = require('util')
 const path = require('path')
 const AWS = require('aws-sdk')
 const parser = require('lambda-multipart-parser')
+const {DateTime} = require('luxon')
 
 const UtilService = require('../UtilService')
 const StatementService = require('./StatementService')
@@ -37,6 +38,7 @@ exports.handler = async (event) => {
           const statementIdMatches = /^(.*)-(\d{4}-\d{2})$/.exec(statementId)
           statementId = `${statementIdMatches[2]}-${statementIdMatches[1]}`
 
+          const nowStr = DateTime.local().toFormat("yyyyMMddHHmmss")
           const result = await dynamodbBatchWrite({
             RequestItems: {
               'finances-statements': [
@@ -45,7 +47,8 @@ exports.handler = async (event) => {
                     Item: {
                       user: { S: uid },
                       statementId: { S: statementId },
-                      status: { S: 'UPLOADED' }
+                      status: { S: 'UPLOADED' },
+                      uploadedOn: { N: nowStr }
                     }
                   }
                 }
@@ -54,7 +57,7 @@ exports.handler = async (event) => {
                 {
                   PutRequest: {
                     Item: {
-                      timestamp: { N: String(Date.now()) },
+                      timestamp: { N: nowStr },
                       user: { S: uid },
                       action: { S: `Uploaded statement ${path.basename(file.filename, '.pdf')}` }
                     }

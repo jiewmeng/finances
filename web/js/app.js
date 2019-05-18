@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Redirect, Link, Switch } from 'react-router-dom'
-import { Layout, Menu, Icon } from 'antd'
+import { Layout, Menu, Icon, Upload } from 'antd'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 
@@ -21,6 +21,7 @@ import LoginPage from './auth/LoginPage'
 import NotFoundPage from './NotFoundPage'
 import DashboardPage from './dashboard/DashboardPage'
 import BankPage from './bank/BankPage'
+import UploadPage from './statement/UploadPage'
 import AppContext from './AppContext'
 
 class App extends React.Component {
@@ -55,12 +56,19 @@ class App extends React.Component {
             <Header />
 
             <Content style={{ padding: '0 50px' }}>
-              <Switch>
-                <Route path="/auth/login" exact component={LoginPage} />
-                <Route path="/" exact component={DashboardPage} />
-                <Route path="/bank" exact component={BankPage} />
-                <Route component={NotFoundPage} />
-              </Switch>
+              <AppContext.Consumer>
+                {(auth) => {
+                  return (
+                    <Switch>
+                      <Route path="/auth/login" exact component={LoginPage} />
+                      <Route path="/" exact component={DashboardPage} />
+                      <Route path="/bank" exact component={BankPage} />
+                      <Route path="/statement/upload" exact render={renderProps => <UploadPage {...renderProps} auth={auth} />} />
+                      <Route component={NotFoundPage} />
+                    </Switch>
+                  )
+                }}
+              </AppContext.Consumer>
             </Content>
 
             <Footer>&copy; Finances 2019</Footer>

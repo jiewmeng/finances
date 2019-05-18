@@ -4,7 +4,9 @@ import PageHeader from 'ant-design-pro/lib/PageHeader'
 import DescriptionList from 'ant-design-pro/lib/DescriptionList'
 import NumberInfo from 'ant-design-pro/lib/NumberInfo'
 import { ChartCard, MiniArea } from 'ant-design-pro/lib/Charts'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { DateTime } from 'luxon'
+import { Link } from 'react-router-dom'
 
 export default class DashboardPage extends React.Component {
   render() {
@@ -316,17 +318,17 @@ export default class DashboardPage extends React.Component {
             <Col span={24}>
               <Card title="Assets (Bank + Investments)">
                 <ResponsiveContainer width="100%" height={360}>
-                  <BarChart data={assetData}>
+                  <AreaChart data={assetData}>
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <Bar stackId="a" type="monotone" name="DBS" dataKey="dbsBank" stroke="#a8071a" fill="#a8071a" strokeWidth={2} />
-                    <Bar stackId="a" type="monotone" name="UOB" dataKey="uobBank" stroke="#0050b3" fill="#0050b3" strokeWidth={2} />
-                    <Bar stackId="a" type="monotone" name="StashAway" dataKey="stashaway" stroke="#a0d911" fill="#a0d911" strokeWidth={2} />
-                    <Bar stackId="a" type="monotone" name="POEMS" dataKey="poems" stroke="#1890ff" fill="#1890ff" strokeWidth={2} />
-                  </BarChart>
+                    <Area stackId="a" type="monotone" name="DBS" dataKey="dbsBank" stroke="#FF1744" fill="#FF1744" strokeWidth={2} />
+                    <Area stackId="a" type="monotone" name="UOB" dataKey="uobBank" stroke="#3D5AFE" fill="#3D5AFE" strokeWidth={2} />
+                    <Area stackId="a" type="monotone" name="StashAway" dataKey="stashaway" stroke="#00E676" fill="#00E676" strokeWidth={2} />
+                    <Area stackId="a" type="monotone" name="POEMS" dataKey="poems" stroke="#00B0FF" fill="#00B0FF" strokeWidth={2} />
+                  </AreaChart>
                 </ResponsiveContainer>
               </Card>
             </Col>
@@ -342,7 +344,7 @@ export default class DashboardPage extends React.Component {
 
           <Row gutter={16}>
             <Col span={24}>
-              <Card title="Recent Statements Uploaded" extra={<Button type="primary"><Icon type="cloud-upload" />Upload</Button>}>
+              <Card title="Recent Statements Uploaded" extra={<Button type="primary"><Link to="/statement/upload"><Icon type="cloud-upload" /> Upload</Link></Button>}>
                 <Table bordered size="middle" columns={tableColumns} dataSource={tableData} />
               </Card>
             </Col>

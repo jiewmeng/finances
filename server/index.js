@@ -55,6 +55,7 @@ exports.handler = async (event) => {
     if (!filenameMatches) {
       throw new Error(`[ERROR] Invalid s3 key ${s3key}`)
     }
+    const nowStr = DateTime.local().toFormat("yyyyMMddHHmmss")
 
     const [, uid, filename] = s3key.split('/')
 
@@ -120,7 +121,7 @@ exports.handler = async (event) => {
 
         await dynamodbPutItem({
           Item: {
-            timestamp: { N: String(Date.now()) },
+            timestamp: { N: nowStr },
             user: { S: uid },
             action: { S: `[ERROR] ${msg}` }
           },
@@ -168,6 +169,7 @@ exports.handler = async (event) => {
 
       const itemsToWrite = []
 
+      console.log(`Type of uploadedOn ${typeof checkResult.Items[0].uploadedOn}`)
 
       // write statement record
       itemsToWrite.push({
@@ -191,7 +193,8 @@ exports.handler = async (event) => {
                     }
                   }
                 })
-              }
+              },
+              uploadedOn: { N: String(checkResult.Items[0].uploadedOn) }
             }
           }
         }
@@ -241,7 +244,7 @@ exports.handler = async (event) => {
         'finances-logs': {
           PutRequest: {
             Item: {
-              timestamp: { N: String(Date.now()) },
+              timestamp: { N: nowStr },
               user: { S: uid },
               action: { S: `[SUCCESS] Finished parsing ${statement.statementId}` }
             }

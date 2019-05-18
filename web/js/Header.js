@@ -29,8 +29,10 @@ export default class Header extends React.Component {
                 <Menu.Item onClick={this.logout}>Logout</Menu.Item>
               </Menu.SubMenu>
               <Menu.Item style={{float: 'right'}}>
-                <Icon type="cloud-upload" />
-                Upload Statement
+                <Link to="/statement/upload">
+                  <Icon type="cloud-upload" />
+                  Upload Statement
+                </Link>
               </Menu.Item>
             </Menu>
           ) : null
