@@ -7,8 +7,41 @@ import { ChartCard, MiniArea } from 'ant-design-pro/lib/Charts'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { DateTime } from 'luxon'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { config } from '../../config'
 
 export default class DashboardPage extends React.Component {
+  constructor(params) {
+    super(params)
+
+    this.state = {
+      isInitialized: false,
+      isGettingStatements: false
+    }
+  }
+
+  componentDidMount() {
+    this.getStatements()
+  }
+
+  componentDidUpdate() {
+    this.getStatements()
+  }
+
+  getStatements = async () => {
+    const token = this.props.auth.idToken
+    if (token && !this.state.isInitialized) {
+      this.setState({ isGettingStatements: true })
+      const statements = axios.get(`${config.API_URL}/statements`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      this.setState({ isGettingStatements: false, isInitialized: true })
+      console.log(statements)
+    }
+  }
+
   render() {
     const bankBalances = []
     const creditCardSpending = []

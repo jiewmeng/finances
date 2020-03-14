@@ -1,24 +1,24 @@
 {
   "name": "finances-server",
   "version": "1.0.0",
-  "description": "## Tech Stack",
-  "main": "test.js",
+  "description": "Finances server",
+  "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:layer": "rm -rf build/layer; mkdir build/layer build/layer/nodejs; cp package*.json build/layer/nodejs; (cd build/layer/nodejs; npm i) && (cd build/layer; zip -r ./nodemodules.zip .)",
-    "build": "rm -rf build/source; mkdir build/source; cp -R parser index.js build/source && (cd build/source; zip -r ./source.zip .)",
+    "clean": "rm -rf build; mkdir build; touch build/.gitkeep",
+    "build:parsing:layer": "rm -rf build/parsing-layer; mkdir build/parsing-layer build/parsing-layer/nodejs; cp parsing/package*.json build/parsing-layer/nodejs; (cd build/parsing-layer/nodejs; npm i --production) && (cd build/parsing-layer; zip -r ./nodemodules.zip .)",
+    "build:parsing": "rm -rf build/parsing; mkdir build/parsing; cp -R parsing build && (cd build/parsing; zip -r ./parsing.zip .)",
+    "build:api:layer": "rm -rf build/api-layer; mkdir build/api-layer build/api-layer/nodejs; cp api/package*.json build/api-layer/nodejs; (cd build/api-layer/nodejs; npm i --production) && (cd build/api-layer; zip -r ./api-nodemodules.zip .)",
     "build:api": "rm -rf build/api; mkdir build/api; cp -R api build/api && (cd build/api; zip -r ./api.zip .)",
-    "build:api:layer": "rm -rf build/api-layer; mkdir build/api-layer build/api-layer/nodejs; cp api/package*.json build/api-layer/nodejs; (cd build/api-layer/nodejs; npm i) && (cd build/api-layer; zip -r ./api-nodemodules.zip .)",
-    "deploy": "",
+    "build:layers": "npm run build:parsing:layer && npm run build:api:layer",
+    "build": "npm run build:parsing && npm run build:api",
     "tf:init": "(cd terraform; terraform init -backend-config=env/dev.backend.config)",
     "tf:plan": "(cd terraform; terraform plan -var-file=env/dev.tfvars -out plan.out)",
-    "tf:apply": "(cd terraform; terraform apply plan.out)"
+    "tf:apply": "(cd terraform; terraform apply plan.out)",
+    "deploy": "npm run tf:plan && npm run tf:apply"
   },
-  "author": "",
+  "author": "Jiew Meng <jiewmeng@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.422.0",
-    "luxon": "^1.13.2",
-    "pdf-parse": "^1.1.1"
   }
 }

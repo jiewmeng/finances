@@ -61,7 +61,7 @@ class App extends React.Component {
                   return (
                     <Switch>
                       <Route path="/auth/login" exact component={LoginPage} />
-                      <Route path="/" exact component={DashboardPage} />
+                      <Route path="/" exact render={renderProps => <DashboardPage {...renderProps} auth={auth.auth} />} />
                       <Route path="/bank" exact component={BankPage} />
                       <Route path="/statement/upload" exact render={renderProps => <UploadPage {...renderProps} auth={auth} />} />
                       <Route component={NotFoundPage} />

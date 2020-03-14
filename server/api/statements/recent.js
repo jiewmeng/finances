@@ -10,13 +10,11 @@ exports.handler = async (event) => {
   try {
     const statementsResult = await dynamodbQuery({
       TableName: 'finances-statements',
+      IndexName: 'finances-logs-uploadedOn',
       AttributesToGet: [
         'statementId',
         'status',
-        'type',
-        'subType',
         'uploadedOn',
-        'accounts'
       ],
       Select: 'SPECIFIC_ATTRIBUTES',
       Limit: 50,

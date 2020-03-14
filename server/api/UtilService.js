@@ -1,4 +1,5 @@
 const AppError = require('./AppError')
+const { DateTime } = require('luxon')
 
 module.exports = class UtilService {
   static jsonResponse(event, data, statusCode = 200) {
@@ -40,22 +41,45 @@ module.exports = class UtilService {
     }, 500)
   }
 
+  static getDynamoValue(item) {
+    let val
+    Object.keys(item).forEach(t => {
+      switch (t) {
+        case 'N':
+          val = parseFloat(item[t])
+          break
+
+        case 'L':
+          val = item[t].map(item => UtilService.getDynamoValue(item))
+          break
+
+        case 'M':
+          val = UtilService.transformDynamoItem(item[t])
+          break
+
+        case 'S':
+        default:
+          val = item[t]
+      }
+    })
+    return val
+  }
+
+  static transformDynamoItem(item) {
+    const obj = {}
+    Object.keys(item).forEach(k => {
+      obj[k] = UtilService.getDynamoValue(item[k])
+    })
+    return obj
+  }
+
   static transformDynamoQueryResult(result) {
-    const data = result.Items.map(item => {
-      const obj = {}
-      Object.keys(item).forEach(k => {
-        Object.keys(item[k]).forEach(t => {
-          switch (t) {
-            case 'N':
-              obj[k] = parseFloat(item[k][t])
-              break
-            case 'S':
-            default:
-              obj[k] = item[k][t]
-          }
-        })
-      })
-      return obj
+    const data = result.Items.map(item => UtilService.transformDynamoItem(item))
+
+    data.forEach(item => {
+      if (item.uploadedOn) {
+        item.uploadedOn = DateTime.fromFormat(String(item.uploadedOn), 'yyyyMMddHHmmss', { zone: 'UTC' }).toISO()
+      }
     })
 
     return {

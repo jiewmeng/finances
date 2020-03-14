@@ -1,20 +1,20 @@
 # Lambda layer for node_modules
-resource "aws_lambda_layer_version" "lambda_layer_nodemodules" {
-  filename = "../build/layer/nodemodules.zip"
-  layer_name = "finances-nodemodules"
+resource "aws_lambda_layer_version" "lambda_parsing_layer_nodemodules" {
+  filename = "../build/parsing-layer/nodemodules.zip"
+  layer_name = "finances-parsing-nodemodules"
   compatible_runtimes = ["nodejs8.10"]
-  source_code_hash = "${filebase64sha256("../build/layer/nodemodules.zip")}"
+  source_code_hash = "${filebase64sha256("../build/parsing-layer/nodemodules.zip")}"
 }
 
 # Lambda to parse statements
 resource "aws_lambda_function" "lambda_parse_statement" {
   function_name = "finances-parse-statement"
   handler = "index.handler"
-  filename = "../build/source/source.zip"
-  source_code_hash = "${filebase64sha256("../build/source/source.zip")}"
+  filename = "../build/parsing/parsing.zip"
+  source_code_hash = "${filebase64sha256("../build/parsing/parsing.zip")}"
   runtime = "nodejs8.10"
   role = "${aws_iam_role.aws_iam_role_lambda.arn}"
-  layers = ["${aws_lambda_layer_version.lambda_layer_nodemodules.arn}"]
+  layers = ["${aws_lambda_layer_version.lambda_parsing_layer_nodemodules.arn}"]
   timeout = 120
   reserved_concurrent_executions = 2
   publish = true
@@ -66,6 +66,26 @@ resource "aws_lambda_function" "api_statements_list" {
     }
   }
 }
+
+# GET /statements/recent
+resource "aws_lambda_function" "api_statements_recent" {
+  function_name = "finances-api-statements-recent-get"
+  handler = "api/statements/recent.handler"
+  filename = "../build/api/api.zip"
+  source_code_hash = "${filebase64sha256("../build/api/api.zip")}"
+  layers = ["${aws_lambda_layer_version.lambda_api_layer_nodemodules.arn}"]
+  runtime = "nodejs8.10"
+  role = "${aws_iam_role.aws_iam_role_lambda.arn}"
+  timeout = 20
+  reserved_concurrent_executions = 5
+  publish = true
+  environment = {
+    variables = {
+      CORS_ORIGINS = "${var.cors_origins}"
+    }
+  }
+}
+
 
 # POST /statements
 resource "aws_lambda_function" "api_statements_upload" {

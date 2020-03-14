@@ -1,0 +1,14 @@
+{
+  "name": "finances-server",
+  "version": "1.0.0",
+  "description": "Parsing module of finances server",
+  "main": "test.js",
+  "scripts": {},
+  "author": "Jiew Meng <jiewmeng@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.422.0",
+    "luxon": "^1.13.2",
+    "pdf-parse": "^1.1.1"
+  }
+}

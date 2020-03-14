@@ -28,7 +28,7 @@ export default class UploadPage extends Component {
   async getRecentlyUploaded(token, refresh = false) {
     if (token && (refresh || (!this.state.isInitialized && !this.state.isGettingStatements))) {
       this.setState({ isGettingStatements: true })
-      const res = await axios.get(`${config.API_URL}/statements`, {
+      const res = await axios.get(`${config.API_URL}/statements/recent`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -59,11 +59,10 @@ export default class UploadPage extends Component {
         title: 'Uploaded On',
         key: 'uploadedOn',
         dataIndex: 'uploadedOn',
-        render: text => <span>{DateTime.fromFormat(String(text), 'yyyyMMddHHmmss', { zone: 'UTC' }).setZone('Asia/Singapore').toFormat('d MMM yyyy H:mm a')}</span>
+        render: text => <span>{DateTime.fromISO(text).toFormat('d MMM yyyy H:mm a')}</span>
       },
     ]
 
-    console.log('got statements', this.state.statements)
     const recentStatementData = this.state.statements
 
     return (
@@ -78,7 +77,7 @@ export default class UploadPage extends Component {
 
                     <Upload.Dragger
                       name="files"
-                      action="https://xlayauw8q7.execute-api.ap-southeast-1.amazonaws.com/v1/statements"
+                      action={`${config.API_URL}/statements`}
                       headers={{ Authorization: `Bearer ${auth.idToken}` }}
                       multiple
                       onChange={(evt) => {

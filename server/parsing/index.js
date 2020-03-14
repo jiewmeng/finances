@@ -169,8 +169,6 @@ exports.handler = async (event) => {
 
       const itemsToWrite = []
 
-      console.log(`Type of uploadedOn ${typeof checkResult.Items[0].uploadedOn}`)
-
       // write statement record
       itemsToWrite.push({
         'finances-statements': {
@@ -194,7 +192,7 @@ exports.handler = async (event) => {
                   }
                 })
               },
-              uploadedOn: { N: String(checkResult.Items[0].uploadedOn) }
+              uploadedOn: { N: checkResult.Items[0].uploadedOn.N }
             }
           }
         }
