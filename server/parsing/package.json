@@ -8,6 +8,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.422.0",
+    "dayjs": "^1.8.22",
     "luxon": "^1.13.2",
     "pdf-parse": "^1.1.1"
   }

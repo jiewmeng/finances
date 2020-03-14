@@ -53,20 +53,21 @@ Transaction
 Statement
 
 - user
-- id
-- statementId
+- yearMonth
+- type (dbs/uob/dbsCredit/)
+- assetType (bank/credit/invest)
+
 - accounts
   + startingBalance
   + endingBalance
-  + cashflow (deposits - withdrawals)
+  + totalWithdrawals
+  + totalDeposits
   + netDeposits (for investments only)
   + returns (for investments only)
   + name
 - startDate
 - endDate
 - status
-- subType (dbs/uob/...)
-- type (bank/credit/invest)
 - uploadedOn
 - filepath
 - activityLog

@@ -1,5 +1,5 @@
 const pdf = require('pdf-parse')
-const {DateTime} = require('luxon')
+const dayjs = require('dayjs')
 
 const TOP = 721
 const BOTTOM = 47
@@ -15,36 +15,14 @@ module.exports = function (buf) {
   let statementDate
   const statementData = {
     statementId: '',
-    startDate: '',
-    endDate: '',
-    accounts: {
-      /**
-       * AccountId: {
-       *    startingBalance,
-       *    endingBalance,
-       *    interest,
-       *    accountName,
-       *    accountNumber,
-       *    totalWithdrawals,
-       *    totalDeposits,
-       *    transactions: [
-       *      {
-       *        date,
-       *        description,
-       *        balance,
-       *        category,
-       *        statement,   // eg. dbs-YYYYMM
-       *        accountName,
-       *        accountNumber,
-       *        amount,
-       *        type,
-       *        id // establish order in day
-       *      }
-       *    ]
-       * }
-       */
-    }
+    startDate: null,
+    endDate: null,
+    accounts: {}
   }
+  let balance
+  let row
+  let accountName
+  let accountNumber
 
   const renderPage = (data) => {
     const opts = {
@@ -89,24 +67,18 @@ module.exports = function (buf) {
             throw new Error('Incorrect date format for account details line')
           }
 
-          statementDate = DateTime.fromFormat(accountDetailsLine[1].str, 'dd MMM yyyy')
-          statementData.statementId = `${statementDate.toFormat('yyyy-MM')}-dbs`
-          statementData.statementYearMonth = statementDate.toFormat('yyyyMM')
-          statementData.type = 'Bank'
-          statementData.subType = 'DBS'
-          statementData.startDate = statementDate.startOf('month').toFormat('yyyy-MM-dd')
-          statementData.endDate = statementDate.endOf('month').toFormat('yyyy-MM-dd')
+          statementDate = dayjs(accountDetailsLine[1].str, 'DD MMM YYYY')
+          statementData.yearMonth = parseInt(statementDate.format('YYYYMM'), 10)
+          statementData.type = 'dbs'
+          statementData.assetType = 'bank'
+          statementData.startDate = statementDate.startOf('month').format('YYYY-MM-DD')
+          statementData.endDate = statementDate.endOf('month').format('YYYY-MM-DD')
         }
 
         // Find for "Account No." (start of account details)
         const accNoItems = contentArea.filter(item => item.str.match(regexAccountNo))
 
-        let accountName
-        let accountNumber
-        let row
-        let balance
-
-        const appendRow = (row) => {
+        const appendRow = () => {
           if (!row) return
 
           row.description = row.description.trim()
@@ -115,6 +87,7 @@ module.exports = function (buf) {
           row.balance = parseFloat(balance.toFixed(2))
 
           statementData.accounts[`${accountName} ${accountNumber}`].transactions.push(row)
+          row = undefined
         }
 
         accNoItems.forEach(item => {
@@ -127,10 +100,11 @@ module.exports = function (buf) {
           .filter(o => Boolean(o))
           accountName = accDetails[0][0].str.trim()
           accountNumber = accDetails[accDetails.length - 1][0].str.trim()
-          statementData.accounts[`${accountName} ${accountNumber}`] = {
-            transactions: [],
-            accountName,
-            accountNumber
+          if (!statementData.accounts[`${accountName} ${accountNumber}`]) {
+            statementData.accounts[`${accountName} ${accountNumber}`] = {
+              transactions: [],
+              name: `${accountName} ${accountNumber}`
+            }
           }
 
           // get the table header row
@@ -189,24 +163,28 @@ module.exports = function (buf) {
                 withdrawal: 0,
                 deposit: 0,
                 balance: 0,
-                accountName,
-                accountNumber,
+                name: `${accountName} ${accountNumber}`,
                 // type: 'CASH'
               }
-              row.date = DateTime.fromFormat(`${item.str} ${statementDate.toFormat('yyyy')}`, 'dd MMM yyyy').toFormat('yyyy-MM-dd')
+              row.date = dayjs(`${item.str} ${statementDate.format('YYYY')}`, 'DD MMM YYYY').format('YYYY-MM-DD')
             } else if (itemStartX >= descriptionStartX && itemEndX <= withdrawalStartX) {
               if (item.str === 'Total') {
                 appendRow(row)
 
                 // Get this rows' columns
                 const totals = contentArea.filter(o => o.transform[5] === item.transform[5])
-                if (totals.length !== 4) {
+                if (totals.length === 4) {
+                  statementData.accounts[`${accountName} ${accountNumber}`].totalWithdrawals = parseFloat(totals[2].str.replace(',', ''))
+                  statementData.accounts[`${accountName} ${accountNumber}`].totalDeposits = parseFloat(totals[3].str.replace(',', ''))
+                  x += 2
+                } else if (totals.length === 3) {
+                  statementData.accounts[`${accountName} ${accountNumber}`].totalWithdrawals = parseFloat(totals[1].str.replace(',', ''))
+                  statementData.accounts[`${accountName} ${accountNumber}`].totalDeposits = parseFloat(totals[2].str.replace(',', ''))
+                  x += 1
+                } else {
                   console.warn(`Unexpected columns in totals row (${totals.length})`)
                   break
                 }
-                statementData.accounts[`${accountName} ${accountNumber}`].totalWithdrawals = parseFloat(totals[2].str.replace(',', ''))
-                statementData.accounts[`${accountName} ${accountNumber}`].totalDeposits = parseFloat(totals[3].str.replace(',', ''))
-                x += 2
                 row = undefined
                 continue
               }
@@ -241,7 +219,6 @@ module.exports = function (buf) {
                 }
                 statementData.accounts[`${accountName} ${accountNumber}`].endingBalance = parseFloat(endBalance[1].str.replace(',', ''))
                 break
-
               }
 
               row.description += `${item.str}\n`
@@ -267,8 +244,6 @@ module.exports = function (buf) {
 
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
     .then(() => {
-      const idPrefix = `cash-${statementDate.toFormat('yyyyMM')}-dbs`
-
       Object.keys(statementData.accounts).forEach((accountId) => {
         const accIdForPrefix = accountId.toLowerCase().replace(/[\s-]/g, '')
 
@@ -279,9 +254,9 @@ module.exports = function (buf) {
             txn.category = 'Salary'
           } else if (txn.description.match(/\bSINGTEL\b/)) {
             txn.category = 'Utilities'
-          } else if (txn.description.match(/\bAVIVA\b/)) {
+          } else if (txn.description.match(/\bAVIVA\b|NTUC INCOME/)) {
             txn.category = 'Insurance'
-          } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX/)) {
+          } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX|Unit Trust Application/)) {
             txn.category = 'Investments'
           } else if (txn.description.match(/\b(TRANSITLIN|TRANSIT LI|ez-link Card Top-up)\b/)) {
             txn.category = 'Transport'
@@ -293,14 +268,16 @@ module.exports = function (buf) {
             txn.category = 'Credit Card Payment'
           } else if (txn.description.match(/Cash Withdrawal/)) {
             txn.category = 'Withdrawal'
+          } else if (txn.description.match(/Incoming PayNow/)) {
+            txn.category = 'PayNowIn'
           } else {
             txn.category = 'Unknown'
           }
 
           txn.amount = txn.deposit - txn.withdrawal
-          txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
-          delete txn.deposit
-          delete txn.withdrawal
+          // txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
+          // delete txn.deposit
+          // delete txn.withdrawal
         })
       })
       return statementData
