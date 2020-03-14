@@ -1,5 +1,5 @@
 const pdf = require('pdf-parse')
-const { DateTime } = require('luxon')
+const dayjs = require('dayjs')
 
 module.exports = function (buf) {
   const LEFT = 52.4
@@ -55,9 +55,9 @@ module.exports = function (buf) {
             // Parse statement date in page 1
             if (data.pageIndex === 0 && regexStatementDate.test(line.str)) {
               const [, dateStr] = regexStatementDate.exec(line.str)
-              statementDate = DateTime.fromFormat(dateStr, 'dd MMM yyyy')
-              statementYear = statementDate.toFormat('yyyy')
-              statementYearMonth = statementDate.toFormat('yyyyMM')
+              statementDate = dayjs(dateStr, 'DD MMM YYYY')
+              statementYear = statementDate.format('YYYY')
+              statementYearMonth = statementDate.format('YYYYMM')
               return
             }
             if (data.pageIndex === 0) return
@@ -80,10 +80,8 @@ module.exports = function (buf) {
                 accounts[account] = {
                   startingBalance: 0,
                   endingBalance: 0,
-                  interest: 0,
                   transactions: [],
-                  accountName,
-                  accountNumber
+                  name: `${accountName} ${accountNumber}`,
                 }
               }
               return
@@ -149,12 +147,12 @@ module.exports = function (buf) {
                     accounts[account].startingBalance = balance
                   } else {
                     accounts[account].transactions.push({
-                      date: DateTime.fromFormat(date, 'd MMM yyyy').toFormat('yyyy-MM-dd'),
-                      accountName: accounts[account].accountName,
-                      accountNumber: accounts[account].accountNumber,
+                      date: dayjs(date, 'D MMM YYYY').format('YYYY-MM-DD'),
+                      // account: `${accounts[account].name}`,
                       description,
-                      withdrawals,
-                      deposits,
+                      // withdrawals,
+                      // deposits,
+                      amount: deposits - withdrawals,
                       balance
                     })
                   }
@@ -195,25 +193,24 @@ module.exports = function (buf) {
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
   // return pdf(buf, { max: 0, version: 'v2.0.943', pagerender: renderPage })
     .then(() => {
-      const idPrefix = `cash-${statementDate.toFormat('yyyyMM')}-uob`
 
       // Compute interests and other fields
       Object.keys(accounts).forEach(account => {
-        const accIdForPrefix = `${account.toLowerCase().replace(/[\s-]/g, '')}`
+        // accounts[account].interest = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
+        //   if (txn.description === 'One Bonus Interest' || txn.description === 'Interest Credit') {
+        //     return sum + txn.deposits
+        //   }
+        //   return sum
+        // }, 0).toFixed(2))
 
-        accounts[account].interest = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
-          if (txn.description === 'One Bonus Interest' || txn.description === 'Interest Credit') {
-            return sum + txn.deposits
-          }
+        accounts[account].totalWithdrawals = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
+          if (txn.amount < 0) return sum + (-1 * txn.amount)
           return sum
         }, 0).toFixed(2))
 
-        accounts[account].totalWithdrawals = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
-          return sum + txn.withdrawals
-        }, 0).toFixed(2))
-
         accounts[account].totalDeposits = parseFloat(accounts[account].transactions.reduce((sum, txn) => {
-          return sum + txn.deposits
+          if (txn.amount > 0) return sum + txn.amount
+          return sum
         }, 0).toFixed(2))
 
         accounts[account].transactions.forEach((txn, i) => {
@@ -223,7 +220,7 @@ module.exports = function (buf) {
             txn.category = 'Salary'
           } else if (/Phillip Securities|Asia Wealth Platform/ig.test(txn.description)) {
             txn.category = 'Investments'
-          } else if (/AVIVA/ig.test(txn.description)) {
+          } else if (/AVIVA|NTUC INCOME/ig.test(txn.description)) {
             txn.category = 'Insurance'
           } else if (/STARHUB/ig.test(txn.description)) {
             txn.category = 'Utilities'
@@ -237,25 +234,24 @@ module.exports = function (buf) {
             txn.category = 'PayNow'
           } else if (/Cash Withdrawal/ig.test(txn.description)) {
             txn.category = 'Withdrawal'
+          } else if (/Cash Deposit/ig.test(txn.description)) {
+            txn.category = 'Deposit'
           } else {
             txn.category = 'Unknown'
           }
 
-          txn.amount = txn.deposits - txn.withdrawals
-          delete txn.withdrawals
-          delete txn.deposits
-          txn.id = `${idPrefix}-${accIdForPrefix}-${txn.date.replace(/[\W\D]/g, '')}-${i}`
+          // txn.amount = txn.deposits - txn.withdrawals
+          // delete txn.withdrawals
+          // delete txn.deposits
         })
       })
 
-      const date = DateTime.fromFormat(`${statementYearMonth}01`, 'yyyyMMdd')
       return {
-        statementId: `${statementDate.toFormat('yyyy-MM')}-uob`,
-        statementYearMonth: statementDate.toFormat('yyyyMM'),
-        startDate: statementDate.startOf('month').toFormat('yyyy-MM-dd'),
-        endDate: statementDate.endOf('month').toFormat('yyyy-MM-dd'),
-        type: 'Bank',
-        subType: 'UOB',
+        yearMonth: parseInt(statementDate.format('YYYYMM'), 10),
+        type: 'uob',
+        assetType: 'bank',
+        startDate: statementDate.startOf('month').format('YYYY-MM-DD'),
+        endDate: statementDate.endOf('month').format('YYYY-MM-DD'),
         accounts
       }
     })
