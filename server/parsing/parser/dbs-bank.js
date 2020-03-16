@@ -14,7 +14,6 @@ const regexValue = /^(\d+\,)?\d+\.\d{2}$/
 module.exports = function (buf) {
   let statementDate
   const statementData = {
-    statementId: '',
     startDate: null,
     endDate: null,
     accounts: {}
@@ -163,7 +162,7 @@ module.exports = function (buf) {
                 withdrawal: 0,
                 deposit: 0,
                 balance: 0,
-                name: `${accountName} ${accountNumber}`,
+                // name: `${accountName} ${accountNumber}`,
                 // type: 'CASH'
               }
               row.date = dayjs(`${item.str} ${statementDate.format('YYYY')}`, 'DD MMM YYYY').format('YYYY-MM-DD')

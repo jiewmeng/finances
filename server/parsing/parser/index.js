@@ -4,6 +4,7 @@ const util = require('util')
 
 const UobParser = require('./uob-bank')
 const DbsParser = require('./dbs-bank')
+const DbsCreditParser = require('./dbs-credit')
 
 module.exports = class Parser {
   /**
@@ -30,17 +31,17 @@ module.exports = class Parser {
       case 'dbs':
         output = await DbsParser(buf)
         break
-      // case 'dbscredit':
-      //   output = require('./dbscredit')(data, year, month, monthNumber)
-      //   break
+      case 'dbscredit':
+        output = await DbsCreditParser(buf)
+        break
       case 'uob':
         output = await UobParser(buf)
         break
       // case 'uobcredit':
-      //   output = require('./uobcredit')(data, year, month, monthNumber)
+      //   output = require('./uobcredit')(buf)
       //   break
       // case 'poems':
-      //   output = require('./poems')(data, year, month, monthNumber)
+      //   output = require('./poems')(buf)
       //   break
       default:
         throw new Error(`[INVALID_STMT] Invalid type ${type}`)
