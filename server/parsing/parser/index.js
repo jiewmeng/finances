@@ -5,6 +5,7 @@ const util = require('util')
 const UobParser = require('./uob-bank')
 const DbsParser = require('./dbs-bank')
 const DbsCreditParser = require('./dbs-credit')
+const UobCreditParser = require('./uob-credit')
 
 module.exports = class Parser {
   /**
@@ -37,9 +38,9 @@ module.exports = class Parser {
       case 'uob':
         output = await UobParser(buf)
         break
-      // case 'uobcredit':
-      //   output = require('./uobcredit')(buf)
-      //   break
+      case 'uobcredit':
+        output = await UobCreditParser(buf)
+        break
       // case 'poems':
       //   output = require('./poems')(buf)
       //   break

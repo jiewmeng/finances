@@ -244,8 +244,6 @@ module.exports = function (buf) {
   return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
     .then(() => {
       Object.keys(statementData.accounts).forEach((accountId) => {
-        const accIdForPrefix = accountId.toLowerCase().replace(/[\s-]/g, '')
-
         statementData.accounts[accountId].transactions.forEach((txn, i) => {
           if (txn.description === 'Interest Earned') {
             txn.category = 'Interest'

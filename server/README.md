@@ -65,8 +65,8 @@ Statement
   + netDeposits (for investments only)
   + returns (for investments only)
   + name
-- startDate
-- endDate
+<!-- - startDate
+- endDate -->
 - status
 - uploadedOn
 - filepath

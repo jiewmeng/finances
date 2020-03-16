@@ -1,7 +1,7 @@
 const Parser = require('./parser')
 
 // Parser.parse('/data/JM/Transactions/dbs-bank/dbs-2017-12.pdf')
-Parser.parse('/data/JM/Transactions/dbs-credit/dbscredit-2018-01.pdf')
+Parser.parse('/data/JM/Transactions/dbs-credit/dbscredit-2018-11.pdf')
   .then((statement) => {
     console.log(JSON.stringify(statement, undefined, 2))
 
