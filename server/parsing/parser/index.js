@@ -6,6 +6,7 @@ const UobParser = require('./uob-bank')
 const DbsParser = require('./dbs-bank')
 const DbsCreditParser = require('./dbs-credit')
 const UobCreditParser = require('./uob-credit')
+const ScCreditParser = require('./sc-credit')
 
 module.exports = class Parser {
   /**
@@ -18,7 +19,7 @@ module.exports = class Parser {
     const buf = await readFile(filepath)
 
     const filename = path.basename(filepath)
-    const regexFilename = /^(dbscredit|dbs|uobcredit|uob|poems)-(\d{4})-(\d{2}).pdf$/
+    const regexFilename = /^(dbscredit|dbs|uobcredit|uob|sc|poems)-(\d{4})-(\d{2}).pdf$/
     const matchFilename = regexFilename.exec(filename)
     if (!matchFilename) {
       return console.error('Invalid filename format', filename)
@@ -40,6 +41,9 @@ module.exports = class Parser {
         break
       case 'uobcredit':
         output = await UobCreditParser(buf)
+        break
+      case 'sc':
+        output = await ScCreditParser(buf)
         break
       // case 'poems':
       //   output = require('./poems')(buf)
