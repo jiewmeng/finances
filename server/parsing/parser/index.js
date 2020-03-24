@@ -29,21 +29,27 @@ module.exports = class Parser {
     month = parseInt(month, 10)
 
     let output
+    let stmtParser
     switch (type) {
       case 'dbs':
-        output = await DbsParser(buf)
+        stmtParser = new DbsParser()
+        output = await stmtParser.parse(buf)
         break
       case 'dbscredit':
-        output = await DbsCreditParser(buf)
+        stmtParser = new DbsCreditParser()
+        output = await stmtParser.parse(buf)
         break
       case 'uob':
-        output = await UobParser(buf)
+        stmtParser = new UobParser()
+        output = await stmtParser.parse(buf)
         break
       case 'uobcredit':
-        output = await UobCreditParser(buf)
+        stmtParser = new UobCreditParser()
+        output = await stmtParser.parse(buf)
         break
       case 'sc':
-        output = await ScCreditParser(buf)
+        stmtParser = new ScCreditParser()
+        output = await stmtParser.parse(buf)
         break
       // case 'poems':
       //   output = require('./poems')(buf)
