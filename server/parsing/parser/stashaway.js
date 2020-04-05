@@ -164,9 +164,13 @@ module.exports = class StashawayParser {
             && item.text.startsWith('Reporting Currency:')
             && processed[idx + 1].text === 'Opening Balance'
             && processed[idx + 2].text === 'Cashflow'
-            && processed[idx + 10].text.match(/^\(\d{2} \w{3} \d{4}\)$/)
+            && (
+              processed[idx + 10].text.match(/^\(\d{2} \w{3} \d{4}\)$/) // new statement format
+              || processed[idx + 12].text.match(/^\(\d{2} \w{3} \d{4}\)$/) // old statement format
+            )
           ) {
-            let cellIdx = idx + 11
+            const isNewFormat = processed[idx + 10].text.match(/^\(\d{2} \w{3} \d{4}\)$/)
+            let cellIdx = idx + (isNewFormat ? 11 : 13)
             while (true) {
               let account = {
                 name: '',
@@ -181,12 +185,12 @@ module.exports = class StashawayParser {
 
               account.name = processed[cellIdx].text.replace('\n', ' ')
               account.startingBalance = parseFloat(processed[cellIdx + 1].text.replace('$', '').replace(',', ''))
-              account.endingBalance = parseFloat(processed[cellIdx + 5].text.replace('$', '').replace(',', ''))
+              account.endingBalance = parseFloat(processed[cellIdx + (isNewFormat ? 5 : 6)].text.replace('$', '').replace(',', ''))
               account.cashflow = parseFloat(processed[cellIdx + 2].text.replace('$', '').replace(',', '').replace(' ', ''))
 
               accounts.push(account)
 
-              cellIdx += 6
+              cellIdx += (isNewFormat ? 6 : 7)
             }
 
             processedIdx = cellIdx
@@ -227,7 +231,8 @@ module.exports = class StashawayParser {
               accounts[txnsAccountIdx].transactions.push({
                 description: desc,
                 date: dayjs(dateStr, 'DD MMM YYYY').format('YYYY-MM-DD'),
-                amount: parseFloat(amt.replace('$', '').replace(',', ''))
+                amount: parseFloat(amt.replace('$', '').replace(',', '')),
+                category: 'Investments'
               })
             }
 

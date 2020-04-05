@@ -1,0 +1,63 @@
+{
+  "yearMonth": 202001,
+  "type": "uob",
+  "assetType": "bank",
+  "accounts": [
+    {
+      "startingBalance": 6168.03,
+      "endingBalance": 27164,
+      "transactions": [
+        {
+          "date": "2020-01-02",
+          "description": "Inward Credit-FAST\nOTHR Other\nLIM JIEW MENG\nJiew Meng",
+          "amount": 5000,
+          "balance": 11168.03,
+          "category": "Unknown"
+        },
+        {
+          "date": "2020-01-02",
+          "description": "Inward Credit-FAST\nOTHR Other\nLIM JIEW MENG\nJiew Meng",
+          "amount": 5000,
+          "balance": 16168.03,
+          "category": "Unknown"
+        },
+        {
+          "date": "2020-01-03",
+          "description": "Inward Credit-FAST\nOTHR Other\nLIM JIEW MENG\nJiew Meng",
+          "amount": 10000,
+          "balance": 26168.03,
+          "category": "Unknown"
+        },
+        {
+          "date": "2020-01-28",
+          "description": "Bill Payment\niBK-UOB Cards\n4265884037068714",
+          "amount": -105.1,
+          "balance": 26062.93,
+          "category": "Credit Card Payment"
+        },
+        {
+          "date": "2020-01-28",
+          "description": "Cash Deposit-CDM",
+          "amount": 600,
+          "balance": 26662.93,
+          "category": "Deposit"
+        },
+        {
+          "date": "2020-01-28",
+          "description": "Cash Deposit-CDM",
+          "amount": 500,
+          "balance": 27162.93,
+          "category": "Deposit"
+        },
+        {
+          "date": "2020-01-31",
+          "description": "Interest Credit",
+          "amount": 1.07,
+          "balance": 27164,
+          "category": "Interest"
+        }
+      ],
+      "name": "One Account 349-311-891-7"
+    }
+  ]
+}
