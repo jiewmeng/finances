@@ -219,7 +219,7 @@ module.exports = class UobParser {
               txn.category = 'Interest'
             } else if (/Salary/i.test(txn.description)) {
               txn.category = 'Salary'
-            } else if (/Phillip Securities|Asia Wealth Platform/ig.test(txn.description)) {
+            } else if (/Phillip Securities|Asia Wealth Platform|Misc Debit \(SRS\)|NETS\-CENTRAL PROVI/ig.test(txn.description)) {
               txn.category = 'Investments'
             } else if (/AVIVA|NTUC INCOME/ig.test(txn.description)) {
               txn.category = 'Insurance'
@@ -231,6 +231,8 @@ module.exports = class UobParser {
               txn.category = 'Credit Card Payment'
             } else if (/TRANSITLIN/ig.test(txn.description)) {
               txn.category = 'Transport'
+            } else if (/Inward Credit\-FAST/ig.test(txn.description)) {
+              txn.category = 'Transfers'
             } else if (/PAYNOW/ig.test(txn.description)) {
               txn.category = 'PayNow'
             } else if (/Cash Withdrawal/ig.test(txn.description)) {

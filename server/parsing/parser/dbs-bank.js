@@ -265,7 +265,7 @@ module.exports = class DbsParser {
               txn.category = 'Transport'
             } else if (txn.description.match(/Standing Instruction.*(LIM HONG YIN|NEO GEOK LAN)/)) {
               txn.category = 'Family'
-            } else if (txn.description.match(/(Standing Instruction|Funds Transfer)/)) {
+            } else if (txn.description.match(/(Standing Instruction|Funds Transfer|Advice FAST Payment.*I\-BANK)/gm)) {
               txn.category = 'Transfers'
             } else if (txn.description.match(/(CARD CENTRE)/)) {
               txn.category = 'Credit Card Payment'

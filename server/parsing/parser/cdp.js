@@ -176,6 +176,7 @@ module.exports = class CdpParser {
 
     return pdf(buf, { max: 0, version: 'v2.0.550', pagerender: renderPage })
       .then(() => {
+        if (!statementDate) return
         const statementData = {
           yearMonth: parseInt(statementDate.format('YYYYMM'), 10),
           type: 'cdp',
