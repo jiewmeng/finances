@@ -140,7 +140,7 @@ module.exports = class ScCreditParser {
               txn.category = 'Cashback'
             } else if (txn.description.match(/GIRO PAYMENT/)) {
               txn.category = 'Credit Card Payment'
-            } else if (txn.description.match(/iHerb/)) {
+            } else if (txn.description.match(/iHerb/i)) {
               txn.category = 'Online'
             } else {
               txn.category = 'Unknown'

@@ -251,7 +251,7 @@ module.exports = class DbsParser {
       .then(() => {
         Object.keys(statementData.accounts).forEach((accountId) => {
           statementData.accounts[accountId].transactions.forEach((txn, i) => {
-            if (txn.description === 'Interest Earned') {
+            if (txn.description.match(/Interest Earned/)) {
               txn.category = 'Interest'
             } else if (txn.description.match(/\bSalary\b/)) {
               txn.category = 'Salary'
@@ -259,20 +259,20 @@ module.exports = class DbsParser {
               txn.category = 'Utilities'
             } else if (txn.description.match(/\bAVIVA\b|NTUC INCOME/)) {
               txn.category = 'Insurance'
-            } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX|Unit Trust Application|ASIA WEALTH PLATFORM/)) {
+            } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX|Unit Trust Application|ASIA WEALTH PLATFORM|DBS Vickers Securities/)) {
               txn.category = 'Investments'
             } else if (txn.description.match(/\b(TRANSITLIN|TRANSIT LI|ez-link Card Top-up)\b/)) {
               txn.category = 'Transport'
-            } else if (txn.description.match(/Standing Instruction.*(LIM HONG YIN|NEO GEOK LAN)/)) {
+            } else if (txn.description.match(/(LIM HONG YIN|NEO GEOK LAN)/gm)) {
               txn.category = 'Family'
-            } else if (txn.description.match(/(Standing Instruction|Funds Transfer|Advice FAST Payment.*I\-BANK)/gm)) {
+            } else if (txn.description.match(/(Standing Instruction|Funds Transfer|I\-BANK)/gm)) {
               txn.category = 'Transfers'
+            } else if (txn.description.match(/IRAS/i)) {
+              txn.category = 'Taxes'
             } else if (txn.description.match(/(CARD CENTRE)/)) {
               txn.category = 'Credit Card Payment'
-            } else if (txn.description.match(/Cash Withdrawal/)) {
-              txn.category = 'Withdrawal'
-            } else if (txn.description.match(/Incoming PayNow/)) {
-              txn.category = 'PayNowIn'
+            } else if (txn.description.match(/Cash Withdrawal|Deposit/)) {
+              txn.category = 'Withdrawal/Deposits'
             } else {
               txn.category = 'Unknown'
             }

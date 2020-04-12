@@ -233,12 +233,8 @@ module.exports = class UobParser {
               txn.category = 'Transport'
             } else if (/Inward Credit\-FAST/ig.test(txn.description)) {
               txn.category = 'Transfers'
-            } else if (/PAYNOW/ig.test(txn.description)) {
-              txn.category = 'PayNow'
-            } else if (/Cash Withdrawal/ig.test(txn.description)) {
-              txn.category = 'Withdrawal'
-            } else if (/Cash Deposit/ig.test(txn.description)) {
-              txn.category = 'Deposit'
+            } else if (/Cash Withdrawal|Deposit/ig.test(txn.description)) {
+              txn.category = 'Withdrawal/Deposits'
             } else {
               txn.category = 'Unknown'
             }

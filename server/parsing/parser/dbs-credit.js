@@ -117,8 +117,10 @@ module.exports = class DbsCreditParser {
                   txn.category = 'Travel'
                 } else if (txn.description.match(/CIRCLES\.LIFE|GIGA/)) {
                   txn.category = 'Utilities'
-                } else if (txn.description.match(/NTUC FP/)) {
+                } else if (txn.description.match(/NTUC FP|PHOON HUAT|Fairprice/i)) {
                   txn.category = 'Groceries'
+                } else if (txn.description.match(/iHerb|shopee/i)) {
+                  txn.category = 'Online'
                 } else if (txn.description.match(/PURE FITNESS/)) {
                   txn.category = 'Health & Wellness'
                 } else if (txn.description.match(/EZ-LINK EZ-RELOAD|BUS\/MRT/)) {

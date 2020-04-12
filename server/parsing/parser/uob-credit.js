@@ -129,7 +129,7 @@ module.exports = class UobCreditParser {
                 txn.category = 'Groceries'
               } else if (txn.description.match(/GIRO PAYMENT|PAYMT THRU E-BANK/)) {
                 txn.category = 'Credit Card Payment'
-              } else if (txn.description.match(/IHERB|Shopee/)) {
+              } else if (txn.description.match(/IHERB|Shopee/i)) {
                 txn.category = 'Online'
               } else if (txn.description.match(/BUS\/MRT|TRANSIT|Grab Singapore/)) {
                 txn.category = 'Transport'
