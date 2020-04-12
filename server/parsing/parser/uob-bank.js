@@ -219,7 +219,7 @@ module.exports = class UobParser {
               txn.category = 'Interest'
             } else if (/Salary/i.test(txn.description)) {
               txn.category = 'Salary'
-            } else if (/Phillip Securities|Asia Wealth Platform|Misc Debit \(SRS\)|NETS\-CENTRAL PROVI/ig.test(txn.description)) {
+            } else if (/Phillip Securities|Asia Wealth Platform|Misc Debit \(SRS\)|NETS\-CENTRAL PROVI|ASIA WEALTH PLATFORM/ig.test(txn.description)) {
               txn.category = 'Investments'
             } else if (/AVIVA|NTUC INCOME/ig.test(txn.description)) {
               txn.category = 'Insurance'

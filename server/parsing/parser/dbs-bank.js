@@ -259,7 +259,7 @@ module.exports = class DbsParser {
               txn.category = 'Utilities'
             } else if (txn.description.match(/\bAVIVA\b|NTUC INCOME/)) {
               txn.category = 'Insurance'
-            } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX|Unit Trust Application/)) {
+            } else if (txn.description.match(/\bDividends\/Cash Distribution|PHILLIP SECURITIES|NIKKO AM SINGAPORE STI ETF|I-BANK-STI ETF Rfd\b|SSB-GX|Unit Trust Application|ASIA WEALTH PLATFORM/)) {
               txn.category = 'Investments'
             } else if (txn.description.match(/\b(TRANSITLIN|TRANSIT LI|ez-link Card Top-up)\b/)) {
               txn.category = 'Transport'
